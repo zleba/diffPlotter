@@ -3,3 +3,4 @@ fastnlo
 fastnloBuild
 PlottingHelper
 *~
+*.o
