@@ -80,6 +80,8 @@ public:
    void SettIntegratedRange(double tmax) { ftint = tmax;   }
    double GettIntegratedRange() const {return  ftint;}
 
+   void setDPDF(DPDFset &dpdf_) { dpdf = dpdf_; }
+
 protected:
 
    // inherited functions
@@ -94,7 +96,8 @@ protected:
    int fierr;
    int fifit;
    double ftint;
-   static vector<DPDFset> dpdfsLha;
+   vector<DPDFset> dpdfsLha;
+   DPDFset dpdf;
 
 public:
    // Dummy functions for fitting code
@@ -115,7 +118,7 @@ public:
 //______________________________________________________________________________
 
 
-vector<DPDFset> fastNLODiffAlphas::dpdfsLha = {};
+//vector<DPDFset> fastNLODiffAlphas::dpdfsLha = {};
 
 
 fastNLODiffAlphas::fastNLODiffAlphas(string filename) : fastNLODiffReader(filename), fAlphasMz(0.1184) ,fierr(0), fifit(2), ftint(-1.) {
@@ -123,6 +126,9 @@ fastNLODiffAlphas::fastNLODiffAlphas(string filename) : fastNLODiffReader(filena
 
     if(dpdfsLha.size() == 0) {
         dpdfsLha.resize(6);
+        //auto pdfs  = mkPDFs("H1_DPDF_2006B_NLO_pom");
+
+        /*
         dpdfsLha[FitB]    = DPDFset("H1_DPDF_2006B_NLO_pom", "H1_DPDF_2006B_NLO_reg");
         cout << "Bint OK" << endl;
         dpdfsLha[FitA]    = DPDFset("H1_DPDF_2006A_NLO_pom", "H1_DPDF_2006A_NLO_reg");
@@ -135,6 +141,7 @@ fastNLODiffAlphas::fastNLODiffAlphas(string filename) : fastNLODiffReader(filena
         cout << "Fit19 OK" << endl;
         dpdfsLha[ABCDE]  = DPDFset("ABCDE_pom", "ABCDE_reg");
         cout << "ABCDE OK" << endl;
+        */
     }
 }
 
@@ -186,7 +193,7 @@ vector<double> fastNLODiffAlphas::GetDiffXFX(double xpom, double zpom, double mu
    //
 
    //vector < double > xfxFitB(13), xfxFitJets(13), xfxZEUS(13);
-	vector <double> xfx(13);
+	vector <double> xfx(13, 1.0);
    //diffpdf_(&xpom,&zpom,&muf,&xfx[0]);
    int ifit = fifit;
    int ierr = fierr;
@@ -209,7 +216,10 @@ vector<double> fastNLODiffAlphas::GetDiffXFX(double xpom, double zpom, double mu
     }
 	else if(fit == Fit19) {
 		//strpriv_(&zpom, &muf, &xpom, &tmax, &xfxOld[0]);
-        dpdfsLha[Fit19].zfzQ2xp (ierr, zpom, muf*muf, xpom, 0, abs(tmax), xfx);
+        //dpdfsLha[Fit19].zfzQ2xp (ierr, zpom, muf*muf, xpom, 0, abs(tmax), xfx);
+
+        dpdf.zfzQ2xp (ierr, zpom, muf*muf, xpom, 0, abs(tmax), xfx);
+        ierr = ierr;
     }
 	else if(fit == ABCDE) {
 		//strpriv_(&zpom, &muf, &xpom, &tmax, &xfxOld[0]);

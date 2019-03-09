@@ -41,9 +41,9 @@
 using namespace PlottingHelper;
 
 //TString defFile = "H1-LQall-8c.diff";
-TString defFile = "newver";
+const TString defFile = "newver";
 //TString tablesDir = "/home/radek/moje/daniel/tables/";
-TString tablesDir = "../tables/"; //  /home/radek/moje/daniel/tables/";
+const TString tablesDir = "../tables/"; //  /home/radek/moje/daniel/tables/";
 
 const map<TString, TString> analMap = {
     {"FPS",      "#splitline{ H1 FPS}{(HERA #Iota#Iota)}"},
@@ -652,6 +652,7 @@ Theory Histogram::CalcNLO(TString theor_file, Setting setting)
 	cout <<"Theory file is " <<  TheoryFile << endl;
 
 	vector<fastNLODiffAlphas> fnlodiffs;
+	TheoryFile.ReplaceAll("/nlo/", "/nnlo/");
 
 	fnlodiffs.push_back( fastNLODiffAlphas(TheoryFile.Data()) );
 
@@ -4890,9 +4891,11 @@ void readHistograms(vector<Setting> setting, map<const char *, Histogram> &hist,
                    const char *n7=0, const char *n8=0, const char *n9=0, const char *n10=0)
 {
 	const char *names[] = {n1, n2, n3, n4, n5, n6, n7, n8, n9, n10};
+
+//#pragma omp parallel for
 	for(unsigned i = 0; i < sizeof(names)/sizeof(names[0]); ++i) {
 		if(names[i] == 0)
-			break;
+			continue;
 		if(hist.count(names[i]) > 0) {
 			cout << "Histogram " << names[i] << " already exists." << endl;
 			exit(1);
@@ -6402,10 +6405,14 @@ int main(int argc, char** argv){
 	//return 0;
 
     
+	readHistograms(Settings, histVFPS,"../data/Measurement/vfps.txt",
+	     "q2", "ptjet1", "y", "deltaeta", "meaneta", "xpom", "total");
 
+    return 0;
 	readHistograms(Settings, histVFPS,"../data/Measurement/vfps.txt",
 	    "zpom", "q2", "ptjet1", "y", "deltaeta", "meaneta", "xpom", "total", "mx");
 
+    return 0;
 
 	readHistograms(Settings, histFPS, "../data/Measurement/fps_central.txt",
 	    "zpom", "q2", "ptjet1", "y", "deltaetaStar", "logxpom", "total");
@@ -6935,6 +6942,7 @@ Theory Histogram::CalculateVarNLO( fastNLODiffAlphas  &fnlodiff,  vector<double>
 	fastBinsHi = fnlodiff.GetObsBinsUpBounds(0);
 
 
+    cout << "RADEK " << __LINE__ << endl;
 	// calculate and access the cross section
 	typedef std::map<double,  std::vector < std::map< double, double > > >  array3D;
 
@@ -6946,9 +6954,12 @@ Theory Histogram::CalculateVarNLO( fastNLODiffAlphas  &fnlodiff,  vector<double>
 		bins[i] = xMin[i];
 	bins[nBins] = xMax[nBins-1];
 
+    cout << "RADEK " << __LINE__ << endl;
 	int hash = rand();
 
+    cout << "RADEK " << __LINE__ << endl;
 	TH1D *hist = new TH1D(TString::Format("hist%d", hash), "histogram", nBins, bins);
+    cout << "RADEK " << __LINE__ << endl;
 
 	//fnlodiff.SetLHAPDFMember(0);
 
@@ -6956,6 +6967,7 @@ Theory Histogram::CalculateVarNLO( fastNLODiffAlphas  &fnlodiff,  vector<double>
 	vector<double> NloXs=fnlodiff.GetDiffCrossSection();
 	xsQ2 = fnlodiff.Get3DCrossSection();
 
+    cout << "RADEK " << __LINE__ << endl;
 	/*
 	double Sum=0;
 	for(int i = 0; i <NloXs.size(); ++i) {
@@ -6966,6 +6978,7 @@ Theory Histogram::CalculateVarNLO( fastNLODiffAlphas  &fnlodiff,  vector<double>
 	exit(0);
 	*/
 
+    cout << "RADEK " << __LINE__ << endl;
 
 
 	//For interpretation
@@ -6973,11 +6986,13 @@ Theory Histogram::CalculateVarNLO( fastNLODiffAlphas  &fnlodiff,  vector<double>
 	TVectorD nloVec(fastBinsLo.size() );
 
 
+    cout << "RADEK " << __LINE__ << endl;
 	//Fill array of Q2
 	vector<double> Q2arr;
 	for(const auto &a :   (xsQ2.begin()->second)[0])
 		Q2arr.push_back(a.first);
 
+    cout << "RADEK " << __LINE__ << endl;
 	/*
 	for(int i = 0; i <Q2arr.size(); ++i) {
 		Sum+= NloXs[i] * (fastBinsHi[i]-fastBinsLo[i]);

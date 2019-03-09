@@ -39,7 +39,22 @@ fastNLO: $(OBJS) fastNLODiffAlphas.h
 	-Wl,-rpath $(LHA_LIBS) \
     -Wl,-rpath $(DPDF_LIBS) \
 	$(ROOT_LIBS)   -Wl,-rpath $(FastNLOInstallDir)/lib \
-	-o $(EXEC)
+	-o $@
+
+
+testFast: testFast.o fastNLODiffAlphas.h
+	$(CC) -g -fopenmp  testFast.o $(LDFLAGS) \
+	-I$(FastNLOInstallDir)/include -L$(FastNLOInstallDir)/lib -lfastnlotoolkit \
+	$(LHA_INCLUDE)    -I$(DPDF_LIBS)  \
+	-L$(LHA_LIBS) -lLHAPDF \
+	-L$(DPDF_LIBS) -lDPDFset \
+	-Wl,-rpath $(LHA_LIBS) \
+    -Wl,-rpath $(DPDF_LIBS) \
+	$(ROOT_LIBS)   -Wl,-rpath $(FastNLOInstallDir)/lib \
+	-o $@
+
+
+
 
 plotter: plotter.o diffpdferr.f 
 	$(CC)   $^  $(LDFLAGS) \
@@ -51,7 +66,7 @@ plotter: plotter.o diffpdferr.f
 # ../data/Measurement/fullErrors/readcov.o
 #	-I../../../Helenka/dPDFs/install/include/    -I../../../Helenka/dPDFs/dpdfLib  
 plotterNew: plotterNew.o  ../data/Measurement/fullErrors/readcov.o
-	$(CC)   $^  $(LDFLAGS) \
+	$(CC)  -fopenmp $^  $(LDFLAGS) \
 	-I$(FastNLOInstallDir)/include   -I$(DPDF_LIBS) -I$(LHA_INCLUDE)  -L$(FastNLOInstallDir)/lib -lfastnlotoolkit \
 	$(ROOT_LIBS)    \
 	-L$(ARMA_DIR)/lib64 -larmadillo    \
@@ -62,8 +77,25 @@ plotterNew: plotterNew.o  ../data/Measurement/fullErrors/readcov.o
 	-Wl,-rpath  $(DPDF_LIBS)  \
 	-Wl,-rpath $(FastNLOInstallDir)/lib \
 	-Wl,-rpath ../arma/install/lib64 \
-	-Wl,-rpath /opt/anaconda/3/pkgs/mkl-2019.1-144/lib/ \
+	-Wl,-rpath /opt/anaconda/3/pkgs/mkl-2019.1-144/lib/    \
 	-o $@
+
+
+fastDiff: fastDiff.o  ../data/Measurement/fullErrors/readcov.o
+	$(CC)  -fopenmp $^  $(LDFLAGS) \
+	-I$(FastNLOInstallDir)/include   -I$(DPDF_LIBS) -I$(LHA_INCLUDE)  -L$(FastNLOInstallDir)/lib -lfastnlotoolkit \
+	$(ROOT_LIBS)    \
+	-L$(ARMA_DIR)/lib64 -larmadillo    \
+	-L$(DPDF_LIBS) -lDPDFset \
+	-L../PlottingHelper/ -lPlottingHelper -Wl,-rpath,../PlottingHelper   \
+	-L$(LHA_LIBS)   -lLHAPDF \
+	-Wl,-rpath  $(LHA_LIBS)  \
+	-Wl,-rpath  $(DPDF_LIBS)  \
+	-Wl,-rpath $(FastNLOInstallDir)/lib \
+	-Wl,-rpath ../arma/install/lib64 \
+	-Wl,-rpath /opt/anaconda/3/pkgs/mkl-2019.1-144/lib/    \
+	-o $@
+
 
 
 
@@ -77,7 +109,7 @@ clean-objs:
 
 
 %.o: %.cc 
-	$(CC)  $(CFLAGS) -I$(DPDF_LIBS)  -c $(ROOT_INCLUDE) $(LHA_INCLUDE) -I../PlottingHelper/      -o $@ $^   
+	$(CC) -fopenmp   $(CFLAGS) -I$(DPDF_LIBS)  -c $(ROOT_INCLUDE) $(LHA_INCLUDE) -I../PlottingHelper/      -o $@ $^   
 
 
 all: fnlo-tk-h1diffpdf clean-objs
