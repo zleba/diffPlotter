@@ -35,8 +35,8 @@
 #include <algorithm>
 #include <cstring>
 #include <memory>
-#include "/home/radek/Dropbox/programs/vojta/myAxis/RemoveOverlaps.h"
-#include "/home/radek/Dropbox/patrick/undolding/PlottingHelper/plottingHelper.h"
+#include "RemoveOverlaps.h"
+#include "plottingHelper.h"
 
 using namespace PlottingHelper;
 

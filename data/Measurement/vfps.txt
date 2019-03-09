@@ -1,0 +1,87 @@
+total
+nnlojet/VFPS
+nlo,nnlo:H1-LQall-8.diff_VFPS_y.newver.tab
+dummy,#sigma_{tot} [pb]
+y : $\sigma$ IN pb : $1+\delta_{\text{rad}}$ : $1+\delta_{\text{hadr}}$
+	0.0	-0.5	0.5	30.5	+1.6		+2.8		0.999	1.022
+
+zpom
+nnlojet/VFPS
+nlo,nnlo:H1-LQall-8.diff_VFPS_xi2zIP.newver.tab
+z_{IP}^{obs},d#sigma/dz_{IP}^{obs}
+y : $d\sigma/dz_{I\!\!P}$ IN pb : $1+\delta_{\text{rad}}$ : $1+\delta_{\text{hadr}}$
+	0.1	0.0	0.2	32.1	+6.7089		+5.3286	  0.916	1.084
+	0.3	0.2	0.4	59.8	+7.4152		+6.3388	  1.012	1.054
+	0.5	0.4	0.6	48.0	+7.152		+4.752	  1.017	0.996
+	0.7	0.6	0.8	13.9	+5.421		+2.3074	  1.028	0.91
+
+xpom
+nnlojet/VFPS
+nlo,nnlo:H1-LQall-8.diff_VFPS_y.newver.tab
+x_{IP},d#sigma/dx_{IP} [pb]
+y : $d\sigma/dx_{I\!\!P}$ IN pb : $1+\delta_{\text{rad}}$ : $1+\delta_{\text{hadr}}$
+	0.0120	0.010	0.014	2250.0	+321.75		+452.25		0.998	1.058
+	0.0165	0.014	0.019	2210.0	+282.88		+318.24		1.003	1.014
+	0.0215	0.019	0.024	2290.0	+286.25		+274.80		0.997	1.006
+
+y
+nnlojet/VFPS
+nlo,nnlo:H1-LQall-8.diff_VFPS_y.newver.tab
+y,d#sigma/dy [pb]
+xdesc	x	xlow	xhigh	y	dy+	dy-	dy+	dy-	y	y	
+	0.26	0.2	0.32	76.0	+11.932		+10.184		1.06	0.992
+	0.38	0.32	0.44	69.7	+9.8277		+8.1549		0.975	1.002
+	0.50	0.44	0.56	65.4	+9.6138		+6.9978		0.992	1.056
+	0.63	0.56	0.70	38.6	+8.2604		+4.0144		0.948	1.084
+
+q2
+nnlojet/VFPS
+nlo,nnlo:H1-LQall-8.diff_VFPS_q2.newver.tab
+Q^{2} [GeV^{2}],d#sigma/dQ^{2} [pb/GeV^{2}]
+y : $d\sigma/dQ^2$ IN pb/GeV$^2$ : $1+\delta_{\text{rad}}$ : $1+\delta_{\text{hadr}}$
+	4.5	4.0	5.0	4.83	+1.14954		+0.71001		0.982	1.02
+	6.0	5.0	7.0	2.55	+0.54315		+0.39015		1.002	1.02
+	9.0	7.0	11.0	1.66	+0.26726		+0.20086		0.974	1.028
+	20.5	11.0	30.0	0.52	+0.06292		+0.05772		1.019	1.034
+	55.0	30.0	80.0	0.104	+0.020176	+0.018304	1.036	1.013
+
+
+ptjet1
+nnlojet/VFPS
+nlo,nnlo:H1-LQall-8.diff_VFPS_ptj1.newver.tab
+p_{T}^{*jet1} [GeV],d#sigma/dp_{T}^{*jet1} [pb/GeV]
+y : $d\sigma/dE_T^{*\text{jet1}}$ IN pb/GeV : $1+\delta_{\text{rad}}$ : $1+\delta_{\text{hadr}}$
+	6.25	5.5	7.0	11.24	+0.93292		+1.33756		0.999	1.006
+	7.75	7.0	8.5	5.66	+0.92824		+0.71316		0.986	1.034
+	9.25	8.5	10.0	2.55	+0.919		+0.7599		1.05	1.112
+	12.25	10.0	14.5	0.485	+0.21922		+0.07275		0.961	0.976
+
+mx
+nnlojet/VFPS
+nlo,nnlo:H1-LQall-8.diff_VFPS_y.newver.tab
+M_{X} [GeV],d#sigma/dM_{X} [pb/GeV]
+y : $d\sigma/dM_X$ IN pb/GeV : $1+\delta_{\text{rad}}$ : $1+\delta_{\text{hadr}}$
+	15.0	10.0	20.0	0.2	+0.123	 +0.2402		1.024	0.977
+	24.0	20.0	28.0	2.06	+0.1957	 +0.21836	1.026	1.021
+	32.0	28.0	36.0	1.43	+0.17875	 +0.1716		0.952	1.046
+
+deltaeta
+nnlojet/VFPS
+nlo,nnlo:H1-LQall-8.diff_VFPS_etadel.newver.tab
+|#Delta#eta|,d#sigma/d|#Delta#eta| [pb]
+y : $d\sigma/d\vert\Delta\eta^{\text{jets}}\vert$ IN pb : $1+\delta_{\text{rad}}$ : $1+\delta_{\text{hadr}}$
+	0.25	0.0	0.5	24.8	+3.0008		+2.6784		1.015	1.004
+	0.75	0.5	1.0	16.0	+2.816		+2.032		1.002	1.046
+	1.25	1.0	1.5	13.1	+2.6069		+1.7292		0.968	1.03
+	1.75	1.5	2.0	7.8	+2.2542		+1.4352		0.966	1.03
+
+meaneta
+nnlojet/VFPS
+nlo,nnlo:H1-LQall-8.diff_VFPS_etaavg.newver.tab
+#LT#eta#GT,d#sigma/d#LT#eta#GT [pb]
+y : $d\sigma/d\langle\eta^{\text{jets}}\rangle$ IN pb : $1+\delta_{\text{rad}}$ : $1+\delta_{\text{hadr}}$
+	-0.725	-1.0	-0.45	10.3	+2.1733	+1.1433		1.011	0.905
+	-0.25	-0.45	-0.05	30.1	+3.4314		+3.1906		1.021	1.011
+	0.10	-0.05	0.25	30.0	+4.47			+3.45			0.994	1.056
+	0.45	0.25	0.65	9.2	+2.9716		+1.8676		0.921	1.171
+

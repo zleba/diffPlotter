@@ -14,6 +14,8 @@ ROOT_INCLUDE=$(shell root-config --cflags)
 LHA_LIBS=$(shell lhapdf-config --libdir)
 LHA_INCLUDE=$(shell lhapdf-config --cflags)
 
+ARMA_DIR=../arma/install
+
 DPDF_LIBS=../dpdfLib/
 
 
@@ -46,20 +48,18 @@ plotter: plotter.o diffpdferr.f
 	-Wl,-rpath $(FastNLOInstallDir)/lib \
 	-o $@
 
-plotterNew: plotterNew.o diffpdferr.f fastNLODiffAlphas.h ../data/Measurement/fullErrors/readcov.o
+# ../data/Measurement/fullErrors/readcov.o
+#	-I../../../Helenka/dPDFs/install/include/    -I../../../Helenka/dPDFs/dpdfLib  
+plotterNew: plotterNew.o  fastNLODiffAlphas.h  
 	$(CC)   $^  $(LDFLAGS) \
-	-I$(FastNLOInstallDir)/include -L$(FastNLOInstallDir)/lib -lfastnlotoolkit \
-	-I../../../Helenka/dPDFs/install/include/    -I../../../Helenka/dPDFs/dpdfLib  \
+	-I$(FastNLOInstallDir)/include   -I$(DPDF_LIBS) -I$(LHA_INCLUDE)  -L$(FastNLOInstallDir)/lib -lfastnlotoolkit \
 	$(ROOT_LIBS)    \
-	-larmadillo    \
-	-L../../../Helenka/dPDFs/dpdfLib -lDPDFset \
-	h1fitJets/h12007jetsdpdf_pdfMy.o h1fitJets/h12007jetsdpdf_charm.o h1fitJets/h12007jetsdpdf_gluon.o \
-	h1fitJets/h12007jetsdpdf_prcoeff.o h1fitJets/h12007jetsdpdf_singlet.o zeuspdf/lib/libzdpdf09.a \
-	MRW2006/fint.o MRW2006/mrw2006.o \
-	-L/home/radek/Dropbox/patrick/undolding/PlottingHelper -lPlottingHelper -Wl,-rpath,/home/radek/Dropbox/patrick/undolding/PlottingHelper   \
-	-L../../../Helenka/dPDFs/install/lib   -lLHAPDF \
-	-Wl,-rpath  ../../../Helenka/dPDFs/install/lib  \
-	-Wl,-rpath  ../../../Helenka/dPDFs/dpdfLib  \
+	-L$(ARMA_DIR)/lib64 -larmadillo    \
+	-L$(DPDF_LIBS) -lDPDFset \
+	-L../PlottingHelper/ -lPlottingHelper -Wl,-rpath,../PlottingHelper   \
+	-L$(LHA_LIBS)   -lLHAPDF \
+	-Wl,-rpath  $(LHA_LIBS)  \
+	-Wl,-rpath  $(DPDF_LIBS)  \
 	-Wl,-rpath $(FastNLOInstallDir)/lib \
 	-o $@
 
@@ -75,7 +75,7 @@ clean-objs:
 
 
 %.o: %.cc 
-	$(CC)  $(CFLAGS)  -c $(ROOT_INCLUDE) $(LHA_INCLUDE) -I$(DPDF_LIBS)     -o $@ $^   
+	$(CC)  $(CFLAGS) -I$(DPDF_LIBS)  -c $(ROOT_INCLUDE) $(LHA_INCLUDE) -I../PlottingHelper/      -o $@ $^   
 
 
 all: fnlo-tk-h1diffpdf clean-objs
