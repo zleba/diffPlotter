@@ -23,7 +23,7 @@ DPDF_LIBS=../dpdfLib/
 OBJS 	= fnlo-tk-h1diffpdf.o 
 LDFLAGS	= -lm -lpthread  -lgfortran  -lstdc++   # `gtk-config --cflags` `gtk-config --libs` 
 CC 	= g++
-CFLAGS 	= -Wall -g -O2 -I$(FastNLOInstallDir)/include 
+CFLAGS 	= -Wall -g -O0 -I$(FastNLOInstallDir)/include 
 EXEC	= fastNLO
 
 
@@ -50,7 +50,7 @@ plotter: plotter.o diffpdferr.f
 
 # ../data/Measurement/fullErrors/readcov.o
 #	-I../../../Helenka/dPDFs/install/include/    -I../../../Helenka/dPDFs/dpdfLib  
-plotterNew: plotterNew.o  fastNLODiffAlphas.h  
+plotterNew: plotterNew.o  ../data/Measurement/fullErrors/readcov.o
 	$(CC)   $^  $(LDFLAGS) \
 	-I$(FastNLOInstallDir)/include   -I$(DPDF_LIBS) -I$(LHA_INCLUDE)  -L$(FastNLOInstallDir)/lib -lfastnlotoolkit \
 	$(ROOT_LIBS)    \
@@ -61,6 +61,8 @@ plotterNew: plotterNew.o  fastNLODiffAlphas.h
 	-Wl,-rpath  $(LHA_LIBS)  \
 	-Wl,-rpath  $(DPDF_LIBS)  \
 	-Wl,-rpath $(FastNLOInstallDir)/lib \
+	-Wl,-rpath ../arma/install/lib64 \
+	-Wl,-rpath /opt/anaconda/3/pkgs/mkl-2019.1-144/lib/ \
 	-o $@
 
 

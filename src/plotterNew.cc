@@ -42,7 +42,8 @@ using namespace PlottingHelper;
 
 //TString defFile = "H1-LQall-8c.diff";
 TString defFile = "newver";
-
+//TString tablesDir = "/home/radek/moje/daniel/tables/";
+TString tablesDir = "../tables/"; //  /home/radek/moje/daniel/tables/";
 
 const map<TString, TString> analMap = {
     {"FPS",      "#splitline{ H1 FPS}{(HERA #Iota#Iota)}"},
@@ -645,7 +646,7 @@ Theory Histogram::CalcNLO(TString theor_file, Setting setting)
 
 
 	//say::SetGlobalVerbosity(say::DEBUG);
-	TString TheoryFile = TString("/home/radek/moje/daniel/tables/") +theor_path+ theor_file;
+	TString TheoryFile = tablesDir +theor_path+ theor_file;
 	//TheoryFile = "../tables/nnlojet/FPS/nlo/H1-LQall-7.diff_FPS_q2.abs.tab";
 	TheoryFile.ReplaceAll(":", "/");
 	cout <<"Theory file is " <<  TheoryFile << endl;
