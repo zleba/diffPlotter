@@ -1,148 +1,7 @@
-// Author: Daniel Britzger
-// DESY, 02/04/2012
+#include "fastNLODiffAlphas.h"
 
-#ifndef fASTNLODIFFALPHAS
-#define fASTNLODIFFALPHAS
+fastNLODiffAlphas::fastNLODiffAlphas(string filename) : fastNLODiffReader(filename), fAlphasMz(0.1184) ,fierr(0),  ftint(-1.) {
 
-
-//////////////////////////////////////////////////////////////////////////
-//                                                                      //
-//  FastNLODiffUSER                                                     //
-//                                                                      //
-//  FastNLODiffReader is a standalone code for reading                  //
-//  diffractive FastNLO tables of version 2.0 for DIS processes         //
-//                                                                      //
-//                                                                      //
-//////////////////////////////////////////////////////////////////////////
-
-
-#include <string>
-#include <cstdio>
-#include <vector>
-#include <cstdlib>
-#include "fastnlotk/fastNLODiffReader.h"
-#include "fastnlotk/Alphas.h"
-#include <numeric>
-#include <cassert>
-#include "DPDFset.h"
-
-using namespace std;
-
-//void LoadGrid(const string& Label, int n=0);
-//void Set_tmin(double t);
-
-/*
-extern "C" {
-   //   void diffpdf_(double* xpom, double*  zpom, double*  Q2, double *pdfs);
-   void diffpdferr_(double* xpom, double*  zpom, double*  Q2, int* ipdf, int* ierr, double *pdfs, double *tmax);
-   void strpriv_(double* X, double *MUF, double *xpom, double *tcut, double *XPQ);
-   void initialisedpdf_(int *iSet);
-   void getdpdf_(double *xPom, double *tcut, double *z, double *Qsq, const char *PomOrReg, double *DPDF);
-}
-*/
-
-
-class fastNLODiffAlphas : public fastNLODiffReader {
-
-public:
-	enum Fits{ FitB, FitA, FitJets, zeusSJ, Fit19, ABCDE, MRW};
-
-    bool onlyQuarks = false;
-	Fits fit;
-
-   fastNLODiffAlphas(string filename);
-   ~fastNLODiffAlphas(void) {
-      ;
-   };
-
-   // ---- Alphas vars ---- //
-   // Setters
-   void SetMz(double Mz);
-   void SetNFlavor(int nflavor);
-   void SetNLoop(int nloop);
-   void SetAlphasMz(double AlphasMz , bool ReCalcCrossSection = false);
-   // Getters
-   double GetAlphasMz() const;
-   void SetGRVtoPDG2012_2loop();
-
-   void SetLHAPDFFilename(const char* sth) const {;}
-   void SetLHAPDFMember(const int a) {fierr=a;}
-   void SetFit(Fits fit_) {
-        fit = fit_;
-        //if(fit == zeusSJ) {LoadGrid("zeuspdf/grids/zeusD_SJ"); Set_tmin(ftint);} 
-        //if(fit == MRW) {int iset = 1; initialisedpdf_(&iset); }
-   }
-   void IncludeOnlyQuarks(bool st =true) {onlyQuarks = st;}
-
-   int GetFitID() const { return fifit;}
-   void SetFitID( const int ifit) { fifit = ifit; } // set fit id: fitA=1, fitB=2
-
-   void SettIntegratedRange(double tmax) { ftint = tmax;   }
-   double GettIntegratedRange() const {return  ftint;}
-
-   void setDPDF(DPDFset &dpdf_) { dpdf = dpdf_; }
-
-protected:
-
-   // inherited functions
-   double EvolveAlphas(double Q) const ;
-   bool InitPDF();
-   vector<double> GetDiffXFX(double xpom, double zpom, double muf) const ;
-
-   // ---- Alphas vars ---- //
-   double fAlphasMz;
-
-   // ----- diff pdf ----- /
-   int fierr;
-   int fifit;
-   double ftint;
-   vector<DPDFset> dpdfsLha;
-   DPDFset dpdf;
-
-public:
-   // Dummy functions for fitting code
-   int GetNPDFMembers() const { 
-      if ( fifit == 2 ) return 30;
-      else if ( fifit == 1 ) return 32;}
-
-
-};
-
-//______________________________________________________________________________
-
-
-	void ZeusDpdf3(double xP, double zP, double QQ, double f[7], int xpow=1);
-
-
-
-//______________________________________________________________________________
-
-
-//vector<DPDFset> fastNLODiffAlphas::dpdfsLha = {};
-
-
-fastNLODiffAlphas::fastNLODiffAlphas(string filename) : fastNLODiffReader(filename), fAlphasMz(0.1184) ,fierr(0), fifit(2), ftint(-1.) {
-	fit = FitB;	
-
-    if(dpdfsLha.size() == 0) {
-        dpdfsLha.resize(6);
-        //auto pdfs  = mkPDFs("H1_DPDF_2006B_NLO_pom");
-
-        /*
-        dpdfsLha[FitB]    = DPDFset("H1_DPDF_2006B_NLO_pom", "H1_DPDF_2006B_NLO_reg");
-        cout << "Bint OK" << endl;
-        dpdfsLha[FitA]    = DPDFset("H1_DPDF_2006A_NLO_pom", "H1_DPDF_2006A_NLO_reg");
-        cout << "Aint OK" << endl;
-        dpdfsLha[FitJets] = DPDFset("H1_DPDF_2007Jets_NLO_pom", "H1_DPDF_2007Jets_NLO_reg");
-        cout << "Jetsint OK" << endl;
-        dpdfsLha[zeusSJ]  = DPDFset("ZEUS_DPDF_2009SJ_NLO_pom");
-        cout << "ZEUSint OK" << endl;
-        dpdfsLha[Fit19]  = DPDFset("lhaTest_pom", "lhaTest_reg");
-        cout << "Fit19 OK" << endl;
-        dpdfsLha[ABCDE]  = DPDFset("ABCDE_pom", "ABCDE_reg");
-        cout << "ABCDE OK" << endl;
-        */
-    }
 }
 
 
@@ -193,68 +52,17 @@ vector<double> fastNLODiffAlphas::GetDiffXFX(double xpom, double zpom, double mu
    //
 
    //vector < double > xfxFitB(13), xfxFitJets(13), xfxZEUS(13);
-	vector <double> xfx(13, 1.0);
+	vector <double> xfx(13, 0.0);
    //diffpdf_(&xpom,&zpom,&muf,&xfx[0]);
-   int ifit = fifit;
    int ierr = fierr;
    double tmax = ftint;
    //cout <<"RADEK "<< xpom <<" "<< zpom <<" "<< muf <<" "<< tmax << endl;
    //cout << "Tmax is " << tmax << endl;
-	if(fit == FitB) {
-		ifit = 2;
-		//diffpdferr_(&xpom,&zpom,&muf,&ifit,&ierr,&xfx[0],&tmax);
-        dpdfsLha[FitB].zfzQ2xp (ierr, zpom, muf*muf, xpom, 0, abs(tmax), xfx);
-	}
-	else if(fit == FitA) {
-		ifit = 1;
-		//diffpdferr_(&xpom,&zpom,&muf,&ifit,&ierr,&xfxOld[0],&tmax);
-        dpdfsLha[FitA].zfzQ2xp (ierr, zpom, muf*muf, xpom, 0, abs(tmax), xfx);
-	}
-	else if(fit == FitJets) {
-		//strpriv_(&zpom, &muf, &xpom, &tmax, &xfxOld[0]);
-        dpdfsLha[FitJets].zfzQ2xp (ierr, zpom, muf*muf, xpom, 0, abs(tmax), xfx);
-    }
-	else if(fit == Fit19) {
-		//strpriv_(&zpom, &muf, &xpom, &tmax, &xfxOld[0]);
-        //dpdfsLha[Fit19].zfzQ2xp (ierr, zpom, muf*muf, xpom, 0, abs(tmax), xfx);
 
-        dpdf.zfzQ2xp (ierr, zpom, muf*muf, xpom, 0, abs(tmax), xfx);
-        ierr = ierr;
-    }
-	else if(fit == ABCDE) {
-		//strpriv_(&zpom, &muf, &xpom, &tmax, &xfxOld[0]);
-        dpdfsLha[ABCDE].zfzQ2xp (ierr, zpom, muf*muf, xpom, 0, abs(tmax), xfx);
-    }
+   dpdf.zfzQ2xp (ierr, zpom, muf*muf, xpom, 0, abs(tmax), xfx);
 
-    /*
-	else if(fit == zeusSJ) {
-		double q2 = min(10000.0, max(muf*muf, 1.8));
-		//cout << "ZEUS q2 " << q2 << endl;
-		ZeusDpdf3(xpom, zpom, q2, &xfx[6], 1);
-		for(int i = 1; i <=6; ++i)
-			xfx[6-i] = xfx[6+i];
-		for(int i = 0; i < 13; ++i)
-			xfx[i] *= 1.2;
-	}
-
-
-    else if(fit == MRW) {
-        double q2 = muf*muf;
-	    vector <double> DPDFPom(13), DPDFReg(13);
-        getdpdf_(&xpom,&tmax,&zpom,&q2,"Pom",&DPDFPom[0]);
-        getdpdf_(&xpom,&tmax,&zpom,&q2,"Reg",&DPDFReg[0]);
-
-		for(int i = 0; i < 13; ++i) {
-            xfx[i] = 1.2*(DPDFPom[i] + DPDFReg[i]);
-        }
-    }
-    */
-
-	else 
-		assert(0 && "Unknown Fit");
-
-    //cout << "Is only quark " << onlyQuarks << endl;
-    if(onlyQuarks) xfx[6] = 0;
+   //cout << "Is only quark " << onlyQuarks << endl;
+   if(onlyQuarks) xfx[6] = 0;
 	//double sumB = accumulate(xfxFitB.begin(),xfxFitB.end(), 0.0);
 	//double sumJ = accumulate(xfxFitJets.begin(),xfxFitJets.end(), 0.0);
    //cout << "Fit output " << xfxFitB[6] <<" "<< xfxFitJets[6] <<" "<< xfxZEUS[6]<< endl;
@@ -386,7 +194,3 @@ void fastNLODiffAlphas::SetGRVtoPDG2012_2loop() {
       Alphas::PrintInfo();
    }
 }
-
-
-
-#endif

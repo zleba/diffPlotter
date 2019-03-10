@@ -38,65 +38,14 @@
 #include "RemoveOverlaps.h"
 #include "plottingHelper.h"
 
+#include "fastDiffLib.h"
+
 using namespace PlottingHelper;
 
 //TString defFile = "H1-LQall-8c.diff";
 const TString defFile = "newver";
 //TString tablesDir = "/home/radek/moje/daniel/tables/";
 const TString tablesDir = "../tables/"; //  /home/radek/moje/daniel/tables/";
-
-const map<TString, TString> analMap = {
-    {"FPS",      "#splitline{ H1 FPS}{(HERA #Iota#Iota)}"},
-    {"VFPS",     "#splitline{H1 VFPS}{(HERA #Iota#Iota)}"},
-    {"LRG",      "#splitline{ H1 LRG}{(HERA #Iota#Iota)}"},
-    {"LRG_H1",   "#splitline{ H1 LRG}{(HERA #Iota)}"},
-    {"LRGH1820", "#splitline{ H1 LRG}{(300 GeV)}"},
-    {"LRGZEUS",  "#splitline{ZEUS LRG}{  (HERA #Iota)}"},
-};
-const map<TString, TString> analMapInline = {
-    {"FPS",      "H1 FPS (HERA #Iota#Iota)"},
-    {"VFPS",     "H1 VFPS (HERA #Iota#Iota)"},
-    {"LRG",      "H1 LRG (HERA #Iota#Iota)"},
-    {"LRG_H1",   "H1 LRG (HERA #Iota)"},
-    {"LRGH1820", "H1 LRG (300 GeV)"},
-    {"LRGZEUS",  "ZEUS LRG (HERA #Iota)"},
-};
-
-
-//const vector<TString> arrQ[]={
-	//"4 < Q^{2} < 6 GeV^{2}", "6 < Q^{2} < 10 GeV^{2}", "10 < Q^{2} < 18 GeV^{2}",
-    //"18 < Q^{2} < 34 GeV^{2}", "34 < Q^{2} < 100 GeV^{2}",""};
-const map<TString,TString> names2D {
-    {"ptjet1_q2_4_6",   "4 < Q^{2} < 6 GeV^{2}"},
-    {"ptjet1_q2_6_10",  "6 < Q^{2} < 10 GeV^{2}"},
-    {"ptjet1_q2_10_18", "10 < Q^{2} < 18 GeV^{2}"},
-    {"ptjet1_q2_18_34", "18 < Q^{2} < 34 GeV^{2}"},
-    {"ptjet1_q2_34_100","34 < Q^{2} < 100 GeV^{2}"},
-
-    {"zpom_q2_4_10",   "4 < Q^{2} < 10 GeV^{2}"},
-    {"zpom_q2_10_20",  "10 < Q^{2} < 20 GeV^{2}"},
-    {"zpom_q2_20_40",  "20 < Q^{2} < 40 GeV^{2}"},
-    {"zpom_q2_40_100", "40 < Q^{2} < 100 GeV^{2}"},
-
-
-    {"zpom_ptjet1_5_6p5",  "5 < p_{T}^{*jet1} < 6.5 GeV"},
-    {"zpom_ptjet1_6p5_8",  "6.5 < p_{T}^{*jet1} < 8 GeV"},
-    {"zpom_ptjet1_8_16",   "8 < p_{T}^{*jet1} < 16 GeV"},
-
-    {"zpom_q2_5_12",   "4 < Q^{2} < 12 GeV^{2}"},
-    {"zpom_q2_12_25",  "12 < Q^{2} < 25 GeV^{2}"},
-    {"zpom_q2_25_50",  "25 < Q^{2} < 50 GeV^{2}"},
-    {"zpom_q2_50_100", "50 < Q^{2} < 100 GeV^{2}"},
-};
-
-int GetNpads(TCanvas *can)
-{
-    int i;
-    for(i = 1; i < 100; ++i) {
-        if(!can->GetPad(i)) break;
-    }
-    return i - 1;
-}
 
 
 
@@ -114,6 +63,7 @@ double ScoreFitB[2]={}, ScoreFitA[2]={}, ScoreJets[2]={}, ScoreSJ[2]={};
 double ScoreFitBup[2]={}, ScoreFitBdn[2]={};
 double ScoreJetsup[2]={}, ScoreJetsdn[2]={};
 
+map<TString,DPDFset> *Histogram::dpdfs = nullptr;
 
 #define SF TString::Format 
 
@@ -135,235 +85,13 @@ double GetRandom(vector<double> &fastBinsLo, vector<double> &fastBinsHi, TVector
 void plotXi12(TString fileName, const char *xpomN, const char *zpomN);
 
 
-struct Setting
-{
-	double renFactor, factFactor;
-	function<double(double,double)> renFunc, factFunc;
-	TString scaleTag;
-	TString pdfName;
-	int pdfVecId;
-    bool onlyQuarks = false;
-
-
-	TString getFileName() {
-		map<double,char> scaleMap;
-		scaleMap[0.5]='d';
-		scaleMap[1]='c';
-		scaleMap[2]='u';
-
-		return pdfName+"-"+SF("%d",pdfVecId)+"-"+scaleTag+"-"+scaleMap[renFactor]+scaleMap[factFactor];
-	}
-	void CreateFitB(int pdfID, TString ScaleTag, double CoefQ2, double CoefPt2, double sclFact=1) {
-        /*
-        if(ScaleTag != "SqrtQ4pPt4")
-            renFunc=factFunc=[=](double q, double pt) {return  sqrt(CoefQ2*q*q + CoefPt2*pt*pt);};
-        else
-            renFunc=factFunc=[=](double q, double pt) {return  sqrt(sqrt(CoefQ2*q*q*q*q + CoefPt2*pt*pt*pt*pt));};
-        */
-
-        if(ScaleTag == "SqrtQ4pPt4")
-            renFunc=factFunc=[=](double q, double pt) {return  sqrt(sqrt(CoefQ2*q*q*q*q + CoefPt2*pt*pt*pt*pt));};
-        else if(ScaleTag == "ZEUSscale") {
-            renFunc =[=](double q, double pt) {return  sqrt(CoefPt2*pt*pt);};
-            factFunc=[=](double q, double pt) {return  sqrt(CoefQ2*q*q);};
-        }
-        else
-            renFunc=factFunc=[=](double q, double pt) {return  sqrt(CoefQ2*q*q + CoefPt2*pt*pt);};
-
-
-		renFactor = factFactor = sclFact;
-		scaleTag = ScaleTag;
-		pdfName = "FitB";
-		pdfVecId = pdfID;
-	}
-
-
-	void CreateFitA(int pdfID, TString ScaleTag, double CoefQ2, double CoefPt2, double sclFact=1) {
-		renFunc=factFunc=[=](double q, double pt) {return  sqrt(CoefQ2*q*q + CoefPt2*pt*pt);};
-		renFactor = factFactor = sclFact;
-		scaleTag = ScaleTag;
-		pdfName = "FitA";
-		pdfVecId = pdfID;
-	}
-	void CreateFitJets(int pdfID, TString ScaleTag, double CoefQ2, double CoefPt2, double sclFact=1) {
-		renFunc=factFunc=[=](double q, double pt) {return  sqrt(CoefQ2*q*q + CoefPt2*pt*pt);};
-		renFactor = factFactor = sclFact;
-		scaleTag = ScaleTag;
-		pdfName = "FitJets";
-		pdfVecId = pdfID;
-	}
-	void CreateZeusSJ(int pdfID, TString ScaleTag, double CoefQ2, double CoefPt2, double sclFact=1) {
-		renFunc=factFunc=[=](double q, double pt) {return  sqrt(CoefQ2*q*q + CoefPt2*pt*pt);};
-		renFactor = factFactor = sclFact;
-		scaleTag = ScaleTag;
-		pdfName = "zeusSJ";
-		pdfVecId = pdfID;
-	}
-
-	void CreateFit19(int pdfID, TString ScaleTag, double CoefQ2, double CoefPt2, double sclFact=1) {
-		renFunc=factFunc=[=](double q, double pt) {return  sqrt(CoefQ2*q*q + CoefPt2*pt*pt);};
-		renFactor = factFactor = sclFact;
-		scaleTag = ScaleTag;
-		pdfName = "Fit19";
-		pdfVecId = pdfID;
-	}
-
-
-	void CreateMRW(int pdfID, TString ScaleTag, double CoefQ2, double CoefPt2, double sclFact=1) {
-		renFunc=factFunc=[=](double q, double pt) {return  sqrt(CoefQ2*q*q + CoefPt2*pt*pt);};
-		renFactor = factFactor = sclFact;
-		scaleTag = ScaleTag;
-		pdfName = "MRW";
-		pdfVecId = pdfID;
-	}
-};
-
-
 
 
 //__________________________________________________________________________________________________________________________________
 pair<double,double> GetSystTot(vector<double> *sysVec, int binId) ;
 
-struct Theory {
-	int iOrder; //1--LO, 2--NLO, 3--NNLO
-	TString file_name;
-	vector<double> xsc;
-	Setting setting;
-
-	Theory & operator+=(const Theory &th) {
-		assert(xsc.size() == th.xsc.size() );
-		//cout << "Old order " << iOrder << endl;
-		//cout << "New order " << th.iOrder << endl;
-		//assert(iOrder == th.iOrder); TODO
-		for(unsigned i = 0; i < xsc.size(); ++i) {
-			xsc[i]     += th.xsc[i];
-		}
-		return *this;
-	}
-
-	void ReverseBinning() {
-		auto reverseAll = [](vector<double> &v) { reverse(begin(v), end(v) ); };
-		reverseAll(xsc);
-	}
-
-	void Print() const {
-		for(double Xsc : xsc) 
-			cout << Xsc << " ";
-		cout << endl;
-	}
-};
 
 
-class Histogram {
-
-public:
-	void loadData(TString File_name, TString Var_name);
-	Theory LoadTheory(TString theor_file, Setting setting);
-
-	//void LoadNLO() {   nlo = LoadTheory(nlo_file); }
-	//void LoadNNLO() { nnlo = LoadTheory(nnlo_file); }
-
-	void LoadTheories() {
-		for(TString file : theor_files) 
-			for(unsigned i = 0; i < settings.size(); ++i) {
-				TString setTag = settings[i].getFileName();
-				if(!file.Contains("H1-LQall-8c") && !file.Contains(defFile) && i>0) continue;
-                //if(!file.Contains(
-				theories[file+":"+setTag] = LoadTheory(file, settings[i]);
-			}
-	}
-
-	vector<double> LoadHistogramsNloNnloData(TString refName, HistoErr &grData, HistoErr &grNlo, HistoErr &grNnlo, bool sysInside = false);
-	void LoadHistogramsFitJetsSJ(HistoErr &grNloJets, HistoErr &grNnloJets,
-											  HistoErr &grNloSJ, HistoErr &grNnloSJ);
-	HistoErr LoadHistograms(TString name, TString file, TString histName, TString refName);
-
-	void plotDPDFStudies();
-
-	vector<double> GetBinning();
-	int getNbins() {return nBins;}
-
-	void plotNLOvsNNLO();
-	void plotNLOvsNNLOratio(TString plotStyle, double minY, double maxY);
-	void plotNLOvsNNLOratioAbs(TString plotStyle, double minY, double maxY, double minYabs, double maxYabs, double Factors);
-	void plotScaleChoices();
-	void plotScaleStudies();
-
-    void  CalculateGluonFraction();
-	map<double, vector<vector<double>>>  calculateScaleDependence(TString scaleTag, TString tag);
-
-	TString getTag() { return theor_path(theor_path.First('/')+1, theor_path.Last('/')-theor_path.First('/')-1 ); }
-
-	friend void PlotComparison(TCanvas *can,  TString plotStyle,  vector<Histogram*> histos);
-	friend void PlotComparisonWithAbs(TCanvas *can,  TString plotStyle,  vector<Histogram*> histos);
-	friend void PlotSingle(TCanvas *can,  TString plotStyle,  Histogram* hist);
-	friend void plotScaleDependences(TString scaleTag, Histogram *h1, Histogram *h2, Histogram *h3, Histogram *h4, Histogram *h5);
-	friend void PlotTotal(TCanvas *can, Histogram *h1, Histogram *h2, Histogram *h3, Histogram *h4, Histogram *h5, Histogram *h6);
-	friend void plotXi12(TString fileName, const char *xpomN, const char *zpomN);
-	void plotScaleDependence(int binId, TString scaleTag);
-
-	void IncludeSettings(vector<Setting> settings_) {settings=settings_;}
-
-	//Histo Style
-	struct {
-		bool isLogY{false}, isLogX{false};
-		double legX{0.5}, legY{0.6};
-
-	} style;
-
-private:
-
-	TString data_file;
-	TString theor_path;
-	//TString nlo_file;
-	//TString nnlo_file;
-	set<TString> theor_files;
-	TString var_name;
-	TString xTitle;
-	TString yTitle;
-	TString  Title;
-
-	int nBins;
-	static int npdfall;
-
-	double dissFactor;
-
-	vector<double> xMin;
-	vector<double> xMax;
-
-	vector<double> data;
-	vector<double> dataStatErr;
-	vector<double> dataSystErr;
-	vector<double> radCorr;
-	vector<double> hadrCorr;
-
-	//Theory nlo, nnlo;
-	map<TString, Theory> theories;
-	//vector<double> nlo;
-	//vector<double> nloUp;
-	//vector<double> nloDown;
-	//vector< vector<double> > nloSyst;
-
-
-	vector<Setting> settings;
-
-	Theory CalcNLO(TString theor_file, Setting setting);
-	//double GetSystTot(int binId) const;
-
-
-	void ConvertToTotal(Theory &th, vector<double> &fastBinsLo, vector<double> &fastBinsHi);//For total and xpom
-	void ConvertToW(Theory &th, vector<double> &fastBinsLo, vector<double> &fastBinsHi);//For total and xpom
-	Theory CalculateRawNLO( fastNLODiffAlphas  &fnlodiff,  vector<double> &fastBinsLo, vector<double> &fastBinsHi  );//without HadCorr
-	Theory CalculateXpomNLO( fastNLODiffAlphas  &fnlodiff, vector<double> &fastBinsLo, vector<double> &fastBinsHi  );//Xpom Calc
-	Theory CalculateVarNLO( fastNLODiffAlphas  &fnlodiff,  vector<double> &fastBinsLo, vector<double> &fastBinsHi,
-	                     std::function<double(double,double,double)>  func); //xpom,q2,tableVar
-
-
-	TMatrixD CreateInterpolationMatrix(vector<double> &fastBinsLo, vector<double> &fastBinsHi);
-
-};
-
-int Histogram::npdfall = 30;
 
 void Histogram::loadData(TString File_name, TString Var_name)
 {
@@ -582,7 +310,7 @@ Theory Histogram::CalculateRawNLO( fastNLODiffAlphas  &fnlodiff,  vector<double>
 ///NLO and NNLO is specified by ":" tag, e.g. nlo:filename 
 /// test
 
-Theory Histogram::CalcNLO(TString theor_file, Setting setting)
+Theory Histogram::CalcTheory(TString theor_file, Setting setting)
 {
     cout <<"DANIEL " <<  theor_file<< " "<< setting.getFileName() << endl;
 	double normFactor = 1.;
@@ -721,7 +449,9 @@ Theory Histogram::CalcNLO(TString theor_file, Setting setting)
 			fnlodiff.SetProtonE(920.);
 		}
 
+        fnlodiff.setDPDF(dpdfs->at(setting.pdfName));
 
+        /*
 		if(setting.pdfName == "FitB")
 			fnlodiff.SetFit(fastNLODiffAlphas::FitB);
 		else if(setting.pdfName == "FitA")
@@ -736,12 +466,11 @@ Theory Histogram::CalcNLO(TString theor_file, Setting setting)
 			fnlodiff.SetFit(fastNLODiffAlphas::MRW);
 		else
 			assert(0 && "Wrong fit name");
+        */
 
 		fnlodiff.SetLHAPDFMember(setting.pdfVecId);
 
         fnlodiff.IncludeOnlyQuarks(setting.onlyQuarks);
-
-	
 	}
 
 	//reference to first entry
@@ -810,8 +539,6 @@ Theory Histogram::CalcNLO(TString theor_file, Setting setting)
 		//th.xscUp[i] *= dissFactor * normFactor * hadrCorr[i];
 		//th.xscDown[i] *= dissFactor * normFactor * hadrCorr[i];
 
-		//for(int j=0; j <= npdfall; ++j)
-			//th.xscSyst[j][i] *= dissFactor * normFactor * hadrCorr[i];
 
 	}
 
@@ -893,7 +620,6 @@ Theory Histogram::LoadTheory(TString theor_file, Setting setting)
 		th.xsc.resize(nBins);
 		//th.xscUp.resize(nBins);
 		//th.xscDown.resize(nBins);
-		//th.xscSyst.resize(npdfall+1);
 		//for(auto &a : th.xscSyst)
 			//a.resize(nBins);
 
@@ -905,10 +631,6 @@ Theory Histogram::LoadTheory(TString theor_file, Setting setting)
 				nloXsec >> th.xscUp[i];
 			for(int i = 0; i < nBins; ++i)
 				nloXsec >> th.xscDown[i];
-			for(int j = 0; j <= npdfall; ++j) {
-				for(int i = 0; i < nBins; ++i)
-					nloXsec >> th.xscSyst[j][i];
-			}
 			*/
 		}
 		catch (std::ifstream::failure e) {
@@ -919,7 +641,7 @@ Theory Histogram::LoadTheory(TString theor_file, Setting setting)
 		th.setting = setting;
 	}
 	else {
-		th = CalcNLO(theor_file, setting);
+		th = CalcTheory(theor_file, setting);
 
 
 		//Save theory
@@ -937,21 +659,6 @@ Theory Histogram::LoadTheory(TString theor_file, Setting setting)
 
 		for(int i = 0; i < nBins; ++i)
 			nloXsecNew << th.xsc[i] << " ";
-		/*
-		nloXsecNew << endl;
-		for(int i = 0; i < nBins; ++i)
-			nloXsecNew << th.xscUp[i] << " ";
-		nloXsecNew << endl;
-		for(int i = 0; i < nBins; ++i)
-			nloXsecNew << th.xscDown[i] << " ";
-		nloXsecNew << endl;
-
-		for(int j = 0; j <= npdfall; ++j) {
-			for(int i = 0; i < nBins; ++i)
-				nloXsecNew << th.xscSyst[j][i] << " ";
-			nloXsecNew << endl;
-		}
-		*/
 
 		nloXsecNew.close();
 		cout <<"Theory saved to " << fileName << endl;
@@ -1006,12 +713,11 @@ double getBestChi2(TString anal, TString var, vector<double> thVec);
 
 
 void readHistograms(vector<Setting> setting, map<const char *, Histogram> &hist, TString fileName,
-                   const char *n1,   const char *n2=0, const char *n3=0, const char *n4=0, const char *n5=0, const char *n6=0,
-                   const char *n7=0, const char *n8=0, const char *n9=0, const char *n10=0)
+                   const char *n1,   const char *n2, const char *n3, const char *n4, const char *n5, const char *n6,
+                   const char *n7, const char *n8, const char *n9, const char *n10)
 {
 	const char *names[] = {n1, n2, n3, n4, n5, n6, n7, n8, n9, n10};
 
-//#pragma omp parallel for
 	for(unsigned i = 0; i < sizeof(names)/sizeof(names[0]); ++i) {
 		if(names[i] == 0)
 			continue;
@@ -1048,129 +754,6 @@ double getChi2(TH1D *hData, TGraphAsymmErrors *grAll, TH1D *hModel)
 
 
 
-
-
-int main(int argc, char** argv){
-
-	// namespaces
-	using namespace std;
-	using namespace say;		// namespace for 'speaker.h'-verbosity levels
-	using namespace fastNLO;	// namespace for fastNLO constants
-
-	gStyle->SetOptStat(0);
-
-
-	map<const char *, Histogram> histFPS, histVFPS, histBoris, histMozer, histSchatzel, histZEUS;
-	map<const char *, Histogram>  histBorisScales;
-
-	vector<Setting> Settings;
-	Setting sItem;
-	for(int i = 0; i <= 30; ++i) {
-		sItem.CreateFitB(i, "Q2pPt2", 1, 1);
-		Settings.push_back(sItem);
-	}
-	sItem.CreateFitA(0, "Q2pPt2", 1, 1);
-	Settings.push_back(sItem);
-
-	sItem.CreateFitJets(0, "Q2pPt2", 1, 1);
-	Settings.push_back(sItem);
-
-	sItem.CreateZeusSJ(0, "Q2pPt2", 1, 1);
-	Settings.push_back(sItem);
-
-	sItem.CreateMRW(0, "Q2pPt2", 1, 1);
-	Settings.push_back(sItem);
-
-	sItem.CreateFit19(0, "Q2pPt2", 1, 1);
-	Settings.push_back(sItem);
-
-    //Scale variations
-	sItem.CreateFitA(0, "Q2pPt2", 1, 1, 2);//Scale up
-	Settings.push_back(sItem);
-
-	sItem.CreateFitA(0, "Q2pPt2", 1, 1, 0.5);//Scale down
-	Settings.push_back(sItem);
-
-	sItem.CreateFitJets(0, "Q2pPt2", 1, 1, 2);//Scale up
-	Settings.push_back(sItem);
-
-	sItem.CreateFitJets(0, "Q2pPt2", 1, 1, 0.5);//Scale down
-	Settings.push_back(sItem);
-
-
-	sItem.CreateZeusSJ(0, "Q2pPt2", 1, 1, 2);//Scale up
-	Settings.push_back(sItem);
-
-	sItem.CreateZeusSJ(0, "Q2pPt2", 1, 1, 0.5);//Scale down
-	Settings.push_back(sItem);
-
-
-	sItem.CreateMRW(0, "Q2pPt2", 1,1,  2);
-	Settings.push_back(sItem);
-
-	sItem.CreateMRW(0, "Q2pPt2", 1,1, 0.5);
-	Settings.push_back(sItem);
-
-	sItem.CreateFit19(0, "Q2pPt2", 1,1,  2); //Scale up
-	Settings.push_back(sItem);
-
-	sItem.CreateFit19(0, "Q2pPt2", 1,1, 0.5); //Scale up
-	Settings.push_back(sItem);
-
-
-
-
-	sItem.CreateFitB(0, "Q2pPt2", 1, 1, 2); //Scale up
-	Settings.push_back(sItem);
-	sItem.CreateFitB(0, "Q2pPt2", 1, 1, 0.5); //Scale down
-	Settings.push_back(sItem);
-
-	sItem.CreateFitB(0, "Q2", 1, 0); //Scale Q2
-	Settings.push_back(sItem);
-	sItem.CreateFitB(0, "Pt2", 0, 1); //Scale Pt2
-	Settings.push_back(sItem);
-	sItem.CreateFitB(0, "0.25Q2pPt2", 0.25, 1); //Scale Q2/4+Pt2
-	Settings.push_back(sItem);
-
-
-	readHistograms(Settings, histVFPS,"../data/Measurement/vfps.txt",
-	     "q2" );//, "ptjet1", "y", "deltaeta", "meaneta", "xpom", "total");
-
-    return 0;
-	readHistograms(Settings, histVFPS,"../data/Measurement/vfps.txt",
-	    "zpom", "q2", "ptjet1", "y", "deltaeta", "meaneta", "xpom", "total", "mx");
-
-    return 0;
-
-	readHistograms(Settings, histFPS, "../data/Measurement/fps_central.txt",
-	    "zpom", "q2", "ptjet1", "y", "deltaetaStar", "logxpom", "total");
-
-
-	readHistograms(Settings, histBoris,"../data/Measurement/boris.txt",
-	    "zpom", "q2","y", "ptjet1", "ptjet2","ptavg", "deltaetaStar", "logxpom", "total");
-
-	readHistograms(Settings, histBoris,"../data/Measurement/boris.txt",
-	   "ptjet1_q2_4_6", "ptjet1_q2_6_10",  "ptjet1_q2_10_18",
-	                                                                           "ptjet1_q2_18_34", "ptjet1_q2_34_100");
-	readHistograms(Settings, histBoris,"../data/Measurement/boris.txt",
-	   "zpom_q2_4_10", "zpom_q2_10_20", "zpom_q2_20_40", "zpom_q2_40_100");
-
-
-	readHistograms(Settings, histMozer,"../data/Measurement/mozer.txt",  "zpom", "ptjet1", "y", "deltaetaStar", "logxpom", "total");
-
-	readHistograms(Settings, histSchatzel,"../data/Measurement/schatzel.txt", "w", "ptjet1", "q2", "meaneta", "deltaetaStar", "logxpom", "total" );
-
-
-	readHistograms(Settings, histZEUS,"../data/Measurement/zeus.txt",  "w", "q2", "mx", "ptJ", "etaJ", "xpom", "zpom", "total", "beta", "xgamma");
-
-	readHistograms(Settings, histZEUS,"../data/Measurement/zeus.txt",  "zpom_ptjet1_5_6p5", "zpom_ptjet1_6p5_8", "zpom_ptjet1_8_16" );
-	readHistograms(Settings, histZEUS,"../data/Measurement/zeus.txt",  "zpom_q2_5_12", "zpom_q2_12_25", "zpom_q2_25_50", "zpom_q2_50_100" );
-
-
-	return 0;
-
-
-}
 
 void Histogram::ConvertToW(Theory &th, vector<double> &fastBinsLo, vector<double> &fastBinsHi)
 {

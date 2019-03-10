@@ -81,35 +81,30 @@ plotterNew: plotterNew.o  ../data/Measurement/fullErrors/readcov.o
 	-o $@
 
 
-fastDiff: fastDiff.o  ../data/Measurement/fullErrors/readcov.o
+fastCalc:  obj/diffCalc.o obj/fastDiffLib.o obj/fastNLODiffAlphas.o
 	$(CC)  -fopenmp $^  $(LDFLAGS) \
-	-I$(FastNLOInstallDir)/include   -I$(DPDF_LIBS) -I$(LHA_INCLUDE)  -L$(FastNLOInstallDir)/lib -lfastnlotoolkit \
+	 -L$(FastNLOInstallDir)/lib -lfastnlotoolkit \
 	$(ROOT_LIBS)    \
-	-L$(ARMA_DIR)/lib64 -larmadillo    \
 	-L$(DPDF_LIBS) -lDPDFset \
 	-L../PlottingHelper/ -lPlottingHelper -Wl,-rpath,../PlottingHelper   \
 	-L$(LHA_LIBS)   -lLHAPDF \
 	-Wl,-rpath  $(LHA_LIBS)  \
 	-Wl,-rpath  $(DPDF_LIBS)  \
 	-Wl,-rpath $(FastNLOInstallDir)/lib \
-	-Wl,-rpath ../arma/install/lib64 \
-	-Wl,-rpath /opt/anaconda/3/pkgs/mkl-2019.1-144/lib/    \
 	-o $@
 
 
+clean:
+	rm -f obj/*.o fastDiff
 
-
-
-clean: clean-objs
-	rm $(EXEC) 2>/dev/null
 
 
 clean-objs:
 	rm -f *.o *.a *.so *Dict* 2>/dev/null
 
 
-%.o: %.cc 
-	$(CC) -fopenmp   $(CFLAGS) -I$(DPDF_LIBS)  -c $(ROOT_INCLUDE) $(LHA_INCLUDE) -I../PlottingHelper/      -o $@ $^   
+obj/%.o: src/%.cc 
+	$(CC) -fopenmp   $(CFLAGS) -I$(DPDF_LIBS) -Iinc  -c $(ROOT_INCLUDE) $(LHA_INCLUDE) -I../PlottingHelper/      -o $@ $^   
 
 
 all: fnlo-tk-h1diffpdf clean-objs
