@@ -27,6 +27,19 @@ CFLAGS 	= -Wall -g -O0 -I$(FastNLOInstallDir)/include
 EXEC	= fastNLO
 
 
+fastCalc:  obj/diffCalc.o obj/fastDiffLib.o obj/fastNLODiffAlphas.o obj/diffPlotter.o
+	$(CC) -g  -fopenmp $^  $(LDFLAGS) \
+	 -L$(FastNLOInstallDir)/lib -lfastnlotoolkit \
+	$(ROOT_LIBS)    \
+	-L$(DPDF_LIBS) -lDPDFset \
+	-L../PlottingHelper/ -lPlottingHelper -Wl,-rpath,../PlottingHelper   \
+	-L$(LHA_LIBS)   -lLHAPDF \
+	-Wl,-rpath  $(LHA_LIBS)  \
+	-Wl,-rpath  $(DPDF_LIBS)  \
+	-Wl,-rpath $(FastNLOInstallDir)/lib \
+	-o $@
+
+
 
 
 
@@ -81,17 +94,6 @@ plotterNew: plotterNew.o  ../data/Measurement/fullErrors/readcov.o
 	-o $@
 
 
-fastCalc:  obj/diffCalc.o obj/fastDiffLib.o obj/fastNLODiffAlphas.o
-	$(CC)  -fopenmp $^  $(LDFLAGS) \
-	 -L$(FastNLOInstallDir)/lib -lfastnlotoolkit \
-	$(ROOT_LIBS)    \
-	-L$(DPDF_LIBS) -lDPDFset \
-	-L../PlottingHelper/ -lPlottingHelper -Wl,-rpath,../PlottingHelper   \
-	-L$(LHA_LIBS)   -lLHAPDF \
-	-Wl,-rpath  $(LHA_LIBS)  \
-	-Wl,-rpath  $(DPDF_LIBS)  \
-	-Wl,-rpath $(FastNLOInstallDir)/lib \
-	-o $@
 
 
 clean:
@@ -104,7 +106,7 @@ clean-objs:
 
 
 obj/%.o: src/%.cc 
-	$(CC) -fopenmp   $(CFLAGS) -I$(DPDF_LIBS) -Iinc  -c $(ROOT_INCLUDE) $(LHA_INCLUDE) -I../PlottingHelper/      -o $@ $^   
+	$(CC) -g -fopenmp   $(CFLAGS) -I$(DPDF_LIBS) -Iinc  -c $(ROOT_INCLUDE) $(LHA_INCLUDE) -I../PlottingHelper/      -o $@ $^   
 
 
 all: fnlo-tk-h1diffpdf clean-objs

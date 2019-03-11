@@ -92,6 +92,10 @@ public:
 	}
 
     std::vector<double> LoadHistogramsNloNnloData(TString refName, HistoErr &grData, HistoErr &grNlo, HistoErr &grNnlo, bool sysInside = false);
+
+    HistoErr LoadThHistogram(TString refName, bool sysInside);
+    HistoErr LoadDataHistogram();
+
 	void LoadHistogramsFitJetsSJ(HistoErr &grNloJets, HistoErr &grNnloJets,
 											  HistoErr &grNloSJ, HistoErr &grNnloSJ);
 	HistoErr LoadHistograms(TString name, TString file, TString histName, TString refName);
@@ -101,7 +105,7 @@ public:
     std::vector<double> GetBinning();
 	int getNbins() {return nBins;}
 
-	void plotNLOvsNNLO();
+    void plotNLOvsNNLO(vector<TString> typeNames);
 	void plotNLOvsNNLOratio(TString plotStyle, double minY, double maxY);
 	void plotNLOvsNNLOratioAbs(TString plotStyle, double minY, double maxY, double minYabs, double maxYabs, double Factors);
 	void plotScaleChoices();
@@ -185,5 +189,6 @@ void readHistograms(std::vector<Setting> setting, std::map<const char *, Histogr
                    const char *n1,   const char *n2=0, const char *n3=0, const char *n4=0, const char *n5=0, const char *n6=0,
                    const char *n7=0, const char *n8=0, const char *n9=0, const char *n10=0);
 
+void PlotFour(TCanvas *can, vector<TString> Type, map<const char *, Histogram> hists, const char *n1, const char *n2=0, const char *n3=0, const char *n4=0 );
 
 #endif

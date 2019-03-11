@@ -3,22 +3,18 @@
 
 int main(int argc, char** argv){
 
-	// namespaces
-	using namespace std;
-	using namespace say;		// namespace for 'speaker.h'-verbosity levels
-	using namespace fastNLO;	// namespace for fastNLO constants
-
 
 	map<const char *, Histogram> histFPS, histVFPS, histBoris, histMozer, histSchatzel, histZEUS;
 	map<const char *, Histogram>  histBorisScales;
 
 
-    TString pdfName = "H1_DPDF_2006B_NLO";
+    //TString pdfName = "H1_DPDF_2006B_NLO";
+    TString pdfName = "lhaTest";
 
     Histogram::dpdfs = new map<TString,DPDFset> ({
-        { "H1_DPDF_2006B_NLO", DPDFset("H1_DPDF_2006B_NLO_pom", "H1_DPDF_2006B_NLO_reg") }
+        //{ "H1_DPDF_2006B_NLO", DPDFset("H1_DPDF_2006B_NLO_pom", "H1_DPDF_2006B_NLO_reg") },
+        { "lhaTest", DPDFset("lhaTest_pom", "lhaTest_reg") }
     });
-
 
 
 	vector<Setting> Settings;
@@ -36,6 +32,32 @@ int main(int argc, char** argv){
 
 	readHistograms(Settings, histVFPS,"../data/Measurement/vfps.txt",
 	     "q2", "ptjet1", "y", "deltaeta", "meaneta", "xpom", "total");
+
+	readHistograms(Settings, histBoris,"../data/Measurement/boris.txt",
+	     "q2","y", "ptjet1", "ptjet2","ptavg", "deltaetaStar", "logxpom", "total");
+
+	readHistograms(Settings, histBoris,"../data/Measurement/boris.txt",
+	   "ptjet1_q2_4_6", "ptjet1_q2_6_10",  "ptjet1_q2_10_18", "ptjet1_q2_18_34", "ptjet1_q2_34_100");
+
+	readHistograms(Settings, histMozer,"../data/Measurement/mozer.txt",  "ptjet1", "y", "deltaetaStar", "logxpom", "total");
+
+
+    //histVFPS["q2"].plotNLOvsNNLO("nlo:H1_DPDF_2006B_NLO-Q2pPt2");
+
+    TCanvas *can = new TCanvas("can", "test.pdf");
+    can->SaveAs(can->GetTitle()+TString("["));
+    //PlotFour(can, {"nlo:H1_DPDF_2006B_NLO-Q2pPt2", "nnlo:H1_DPDF_2006B_NLO-Q2pPt2"}, histVFPS, "q2", "ptjet1", "y", "deltaeta");
+
+    vector<TString> thVec = {"nnlo:lhaTest-Q2pPt2"};
+    PlotFour(can, thVec, histVFPS, "q2", "ptjet1", "y", "deltaeta");
+    PlotFour(can, thVec, histVFPS, "meaneta", "xpom", "total");
+    PlotFour(can, thVec, histBoris, "q2","y", "ptjet1", "ptjet2");
+    PlotFour(can, thVec, histBoris, "ptavg", "deltaetaStar", "logxpom", "total");
+    PlotFour(can, thVec, histBoris,  "ptjet1_q2_4_6", "ptjet1_q2_6_10",  "ptjet1_q2_10_18", "ptjet1_q2_18_34");
+    PlotFour(can, thVec, histMozer,  "ptjet1", "y", "deltaetaStar", "logxpom");
+    PlotFour(can, thVec, histMozer,  "total");
+
+    can->SaveAs(can->GetTitle()+TString("]"));
 
     return 0;
 	readHistograms(Settings, histVFPS,"../data/Measurement/vfps.txt",
