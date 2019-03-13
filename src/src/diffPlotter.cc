@@ -13,10 +13,37 @@
 #include <iostream> 
 #include <regex> 
 #include <string> 
+#include <cassert> 
 
 #include "plottingHelper.h"
 using namespace PlottingHelper;
 using namespace std;
+
+const map<TString,TString> names2D {
+    {"ptjet1_q2_4_6",   "4 < Q^{2} < 6 GeV^{2}"},
+    {"ptjet1_q2_6_10",  "6 < Q^{2} < 10 GeV^{2}"},
+    {"ptjet1_q2_10_18", "10 < Q^{2} < 18 GeV^{2}"},
+    {"ptjet1_q2_18_34", "18 < Q^{2} < 34 GeV^{2}"},
+    {"ptjet1_q2_34_100","34 < Q^{2} < 100 GeV^{2}"},
+
+    {"zpom_q2_4_10",   "4 < Q^{2} < 10 GeV^{2}"},
+    {"zpom_q2_10_20",  "10 < Q^{2} < 20 GeV^{2}"},
+    {"zpom_q2_20_40",  "20 < Q^{2} < 40 GeV^{2}"},
+    {"zpom_q2_40_100", "40 < Q^{2} < 100 GeV^{2}"},
+
+
+    {"zpom_ptjet1_5_6p5",  "5 < p_{T}^{*jet1} < 6.5 GeV"},
+    {"zpom_ptjet1_6p5_8",  "6.5 < p_{T}^{*jet1} < 8 GeV"},
+    {"zpom_ptjet1_8_16",   "8 < p_{T}^{*jet1} < 16 GeV"},
+
+    {"zpom_q2_5_12",   "4 < Q^{2} < 12 GeV^{2}"},
+    {"zpom_q2_12_25",  "12 < Q^{2} < 25 GeV^{2}"},
+    {"zpom_q2_25_50",  "25 < Q^{2} < 50 GeV^{2}"},
+    {"zpom_q2_50_100", "50 < Q^{2} < 100 GeV^{2}"},
+};
+
+
+
 
 
 
@@ -33,22 +60,28 @@ struct HistoErr {
 	void Init(TString Name, vector<double> &xMin, vector<double> &xMax) {
 		nBins = xMin.size();
 		name = Name;
+        assert(nBins > 0);
 
+        cout << "RADEK " << __LINE__ <<" "<< xMin.size() <<" "<< xMax.size()<< endl;
 		hBins.resize(nBins+1);
 		for(int i = 0; i < nBins; ++i)
 			hBins[i] = xMin[i];
 		hBins[nBins] = xMax[nBins-1];
+        cout << "RADEK " << __LINE__ << endl;
 
 		int hash = rand();
 
 		h = new TH1D( SF("h%s%d",name.Data(), hash), name, nBins, hBins.data());
 
+        cout << "RADEK " << __LINE__ << endl;
 		hRatio = new TH1D( SF("h%sRatio%d",name.Data(),hash), SF("%sRatio",name.Data()), nBins, hBins.data());
 
+        cout << "RADEK " << __LINE__ << endl;
 		gr      = new TGraphAsymmErrors(nBins);
 		grAll   = new TGraphAsymmErrors(nBins);
 		grRatio = new TGraphAsymmErrors(nBins);
 		grAllRatio = new TGraphAsymmErrors(nBins);
+        cout << "RADEK " << __LINE__ << endl;
 	}
 
 	void SetBin(int i, double val, double valRef,
@@ -189,68 +222,22 @@ static void SetNNLOstyle(HistoErr &grNnlo)
     CopyStyle(grNnlo.h, grNnlo.hRatio);
 }
 
-/*
-	void SetDataStyle(HistoErr &grData, bool isLogX, bool isLogY, double Max = -1.) {
-		//Setting style Data
-		grData.gr->SetMarkerStyle(20);
-		grData.gr->SetMarkerSize(pointSize);
-		CopyStyle(grData.gr, grData.grRatio);
 
-		grData.grAll->SetMarkerStyle(20);
-		grData.grAll->SetMarkerSize(pointSize);
-		CopyStyle(grData.grAll, grData.grAllRatio);
-		
+void SetDataStyle(HistoErr &grData) {
+	double pointSize = 0.6;
+    //Setting style Data
+    grData.gr->SetMarkerStyle(20);
+    grData.gr->SetMarkerSize(pointSize);
+    CopyStyle(grData.gr, grData.grRatio);
 
-		upPad->cd();
-
-		if(isLogY) gPad->SetLogy();
-		if(isLogX) gPad->SetLogx();
+    grData.grAll->SetMarkerStyle(20);
+    grData.grAll->SetMarkerSize(pointSize);
+    CopyStyle(grData.grAll, grData.grAllRatio);
 
 
-		grData.h->SetLineColor(kBlack);
-		grData.h->Draw("AXIS");
-		grData.h->GetYaxis()->SetTitle(yTitleUp);
-		grData.h->GetYaxis()->SetTitleSize(fontS);
-		grData.h->GetYaxis()->SetTitleOffset(0.85);
-		grData.h->GetYaxis()->SetLabelSize(fontS);
-		grData.h->GetYaxis()->SetMoreLogLabels();
-		if(isLogY) {
-			grData.h->SetMinimum(0);
-			if(Max == -1.)
-				grData.h->SetMaximum(range[1] * 1.1);
-			else
-				grData.h->SetMaximum(Max);
-		}
-		else {
-			grData.h->SetMinimum(range[0] * 0.8);
-			grData.h->SetMaximum(range[1] * 1.2);
-		}
+    grData.h->SetLineColor(kBlack);
+}
 
-
-		downPad->cd();
-
-		if(isLogX) gPad->SetLogx();
-		grData.hRatio->GetYaxis()->SetNdivisions(204);
-
-		grData.hRatio->SetMinimum( max(0.,range[2] - 0.1*range[3]) );
-		grData.hRatio->SetMaximum( 1.1*range[3] );
-
-
-		grData.hRatio->GetXaxis()->SetTitle(xTitle);
-		grData.hRatio->GetXaxis()->SetTitleSize(fontS * 5./5);
-
-		grData.hRatio->GetYaxis()->SetLabelSize(fontS * 5./5);
-		grData.hRatio->GetXaxis()->SetLabelSize(fontS * 5./5);
-		grData.hRatio->GetXaxis()->SetMoreLogLabels();
-
-		grData.hRatio->GetYaxis()->SetTitle(yTitleDown);
-		grData.hRatio->GetYaxis()->SetTitleSize(fontS * 5./5);
-		grData.hRatio->GetYaxis()->SetTitleOffset(0.84);
-		grData.hRatio->Draw("AXIS");
-
-		currpad->cd();
-	}
-*/
 
 
 pair<double,double> GetSystTot(const vector<vector<double>> &sysVec, int binId) 
@@ -274,6 +261,7 @@ pair<double,double> GetSystTot(const vector<vector<double>> &sysVec, int binId)
 
 HistoErr Histogram::LoadDataHistogram()
 {
+    assert(xMin.size() > 0 && xMax.size() > 0);
     HistoErr grData;
 	grData.Init("Data", xMin, xMax);
 
@@ -286,7 +274,7 @@ HistoErr Histogram::LoadDataHistogram()
 }
 
 
-HistoErr Histogram::LoadThHistogram(TString refName, bool sysInside)
+HistoErr Histogram::LoadThHistogram(TString refName, TString whatInside)
 {
 
 	TString refTag   = refName(0, refName.First(':')+1);
@@ -356,14 +344,12 @@ HistoErr Histogram::LoadThHistogram(TString refName, bool sysInside)
     HistoErr grTh;
 	grTh.Init("Th", xMin, xMax);
 
-    cout << "Radek " << __LINE__ << endl;
 
 	for(unsigned i = 0; i < xMin.size(); ++i) {
 
 		//grData.SetBin(i+1, data[i], refXsc[i], dataStatErr[i], dataStatErr[i],
 		                                   //dataSystErr[i], dataSystErr[i]);
 
-    cout << "Radek " << __LINE__ << endl;
         double refXsc = data[i];
 
 		//LOAD NNLO
@@ -372,18 +358,18 @@ HistoErr Histogram::LoadThHistogram(TString refName, bool sysInside)
 		double thErUp    = max({0., ThUp[i] - Th[i], ThDown[i] - Th[i]});
 		double thErDown  =-min({0., ThUp[i] - Th[i], ThDown[i] - Th[i]});
 
-    cout << "Radek " << __LINE__ << endl;
-		if(sysInside == false)
+		if(whatInside.Contains("scaleInside"))
 			grTh.SetBin(i+1, Th[i], refXsc, thErDown, thErUp,
 			                                       thSystDn, thSystUp);
-		else
+		else if(whatInside.Contains("sysInside"))
 			grTh.SetBin(i+1, Th[i], refXsc, thSystDn, thSystUp,
 			                                       thErDown, thErUp);
-    cout << "Radek " << __LINE__ << endl;
+        else
+            assert(0);
+
 
 
 	}
-    cout << "Radek " << __LINE__ << endl;
     return grTh;
 
 }
@@ -394,6 +380,10 @@ HistoErr Histogram::LoadThHistogram(TString refName, bool sysInside)
 
 void Histogram::plotNLOvsNNLO(vector<TString> typeNames)
 {
+    if(xMin.size() == 0 || xMax.size() == 0) {
+        cout << "Histogram failed : " << var_name << endl;
+        assert(0);
+    }
 
     gStyle->SetOptStat(0);
 
@@ -402,38 +392,44 @@ void Histogram::plotNLOvsNNLO(vector<TString> typeNames)
 
 	HistoErr grData = LoadDataHistogram();
     for(auto n : typeNames) {
-        grTh.push_back(LoadThHistogram(n, false));
+        grTh.push_back(LoadThHistogram(n, "sysInside"));
         //grTh[0] =  LoadThHistogram("nlo:H1_DPDF_2006B_NLO-Q2pPt2", false);
     }
-    cout << "Radek " << __LINE__ << endl;
 
 	//Setting NNLO style
+
+    SetDataStyle(grData);
 	SetNNLOstyle(grTh[0]);
     if(grTh.size() >= 2)
         SetNLOstyle(grTh[1]);
 
-    cout << "Radek " << __LINE__ << endl;
-    gPad->SetLeftMargin(0.17);
+    //gPad->SetLeftMargin(0.17);
+    SetLeftRight(0.17, 0.04);
+    SetTopBottom(0.05, 0.17);
     TVirtualPad *can = gPad;
-    DividePad( {1}, {1,1});
+    //DividePad( {1}, {1.3,1});
+    DivideTransparent( {1}, {1.4,0,1});
 
 	//myCan.SetDataStyle(grData, style.isLogX, style.isLogY);
 
 
-    auto Decorator = []() {
-        SetFTO({15}, {10}, {1.1, 2.1, 0.4, 2.3});
+    cout << "Radek " << xTitle <<" "<< yTitle << " " << Title << endl;
+    auto Decorator = [&]() {
+        SetFTO({12}, {10}, {1.3, 2.2, 0.4, 3.3});
         GetXaxis()->SetNdivisions(303);
         GetYaxis()->SetNdivisions(303);
         GetFrame()->SetTitle("");
+
     };
 
 
 	////////////////////////////////////////////
 	//Up Frame
 	////////////////////////////////////////////
-    cout << "Radek " << __LINE__ << endl;
     can->cd(1);
 
+    if(style.isLogY) gPad->SetLogy();
+    if(style.isLogX) gPad->SetLogx();
     /*
 	if(!style.isLogY) {
 		grData.h->SetMinimum(0);
@@ -445,65 +441,75 @@ void Histogram::plotNLOvsNNLO(vector<TString> typeNames)
 	}
     */
 
-    cout << "Radek " << __LINE__ << endl;
     grTh[0].h->Draw("hist");
 
-    for(HistoErr  &th : grTh) {
-        th.grAll->Draw("e2 same");
-        th.gr->Draw("e2 same");
-        th.h->Draw("same");
+    for(int i = grTh.size()-1; i >= 0; --i) {
+        grTh[i].grAll->Draw("e2 same");
+        grTh[i].gr->Draw("e2 same");
+    }
+    for(int i = grTh.size()-1; i >= 0; --i) {
+        grTh[i].h->Draw("same ][");
     }
 
-    cout << "Radek " << __LINE__ << endl;
 
 	gStyle->SetEndErrorSize(4);
 	grData.gr->Draw("e same");
 	grData.grAll->Draw("pz same");
 
 
+    GetYaxis()->SetTitle(yTitle);
     Decorator();
+    GetXaxis()->SetLabelOffset(1000);
 
-    GetFrame()->SetMaximum(1.2* max(grData.getMax(), grTh[0].getMax()));
+    double Max = -100;
+    for(auto &th : grTh)
+        Max = max(Max, th.getMax());
+    GetFrame()->SetMaximum(1.2* max(grData.getMax(), Max));
+    if(!style.isLogY) GetFrame()->SetMinimum(0);
 
 	//Plot Legend
-
-	TLegend *leg = new TLegend( 0.3, 0.5, 0.3, 0.5);
-	leg->SetBorderSize(0);
-	leg->SetFillStyle(0);
-    /*
+	TLegend *leg = newLegend(kPos9);
 	TString tag =  theor_path(theor_path.First('/')+1, theor_path.Last('/')-theor_path.First('/')-1 );
-	leg->SetHeader(Title);
+
+    if(names2D.count(var_name) > 0 ) {
+        TString n = names2D.at(var_name);
+        leg->SetHeader(n);
+    }
 	leg->AddEntry(grData.gr,    SF("H1 %s data", tag.Data()), "ep");
-
-	leg->AddEntry(grNlo.grAll,     SF("NLO x %.2f",dissFactor) , "fl");
-	leg->AddEntry(grNnlo.grAll,   SF("NNLO  x %.2f", dissFactor) , "fl");
-    */
-
-    cout << "Radek " << __LINE__ << endl;
-	leg->Draw();
+	leg->AddEntry(grTh[0].grAll,     "H1 Fit2019 NNLO" , "fl");
+	leg->AddEntry(grTh[1].grAll,     "H1 Fit2006B NLO" , "fl");
+    DrawLegends({leg});
+	//leg->Draw();
 
 
 	////////////////////////////////////////////
 	//Down Frame
 	////////////////////////////////////////////
     can->cd(2);
+    if(style.isLogX) gPad->SetLogx();
+
     grTh[0].hRatio->Draw("hist");
 
-    for(HistoErr  &th : grTh) {
-        th.grAllRatio->Draw("e2 same");
-        th.grRatio->Draw("e2 same");
-        th.hRatio->Draw("same");
+
+    for(int i = grTh.size()-1; i >= 0; --i) {
+        grTh[i].grAllRatio->Draw("e2 same");
+        grTh[i].grRatio->Draw("e2 same");
     }
-    cout << "Radek " << __LINE__ << endl;
+    for(int i = grTh.size()-1; i >= 0; --i) {
+        grTh[i].hRatio->Draw("same ][");
+    }
+
 
 	grData.grRatio->Draw("p same");
 	grData.grAllRatio->Draw("pz same");
 
     GetYaxis()->SetRangeUser(0,2);
+    GetXaxis()->SetTitle(xTitle);
+    GetYaxis()->SetTitle("#sigma/#sigma_{data}");
+    GetYaxis()->CenterTitle();
 
     Decorator();
 
-    cout << "Radek " << __LINE__ << endl;
     //can->SaveAs("plot.pdf");
 }
 
@@ -516,6 +522,7 @@ void PlotFour(TCanvas *can, vector<TString> Type, map<const char *, Histogram> h
 	for(int i = 0; i < 4 && names[i] != 0; ++i) {
 		can->cd(i+1);
 		try {
+            cout << names[i] << endl;
             hists.at(names[i]).plotNLOvsNNLO(Type);
 		}
 		catch(const std::out_of_range& oor) {

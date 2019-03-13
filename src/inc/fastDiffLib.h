@@ -93,7 +93,7 @@ public:
 
     std::vector<double> LoadHistogramsNloNnloData(TString refName, HistoErr &grData, HistoErr &grNlo, HistoErr &grNnlo, bool sysInside = false);
 
-    HistoErr LoadThHistogram(TString refName, bool sysInside);
+    HistoErr LoadThHistogram(TString refName, TString sysInside);
     HistoErr LoadDataHistogram();
 
 	void LoadHistogramsFitJetsSJ(HistoErr &grNloJets, HistoErr &grNnloJets,

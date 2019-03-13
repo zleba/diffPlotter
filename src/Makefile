@@ -12,7 +12,7 @@ ROOT_LIBS=$(shell root-config --libs)
 ROOT_INCLUDE=$(shell root-config --cflags)
 
 LHA_LIBS=$(shell lhapdf-config --libdir)
-LHA_INCLUDE=$(shell lhapdf-config --cflags)
+LHA_INCLUDE=$(shell lhapdf-config --incdir)
 
 ARMA_DIR=../arma/install
 
@@ -46,7 +46,7 @@ fastCalc:  obj/diffCalc.o obj/fastDiffLib.o obj/fastNLODiffAlphas.o obj/diffPlot
 fastNLO: $(OBJS) fastNLODiffAlphas.h
 	$(CC) -g  $(OBJS) $(LDFLAGS) \
 	-I$(FastNLOInstallDir)/include -L$(FastNLOInstallDir)/lib -lfastnlotoolkit \
-	$(LHA_INCLUDE)    -I$(DPDF_LIBS)  \
+	-I$(LHA_INCLUDE)    -I$(DPDF_LIBS)  \
 	-L$(LHA_LIBS) -lLHAPDF \
 	-L$(DPDF_LIBS) -lDPDFset \
 	-Wl,-rpath $(LHA_LIBS) \
@@ -55,8 +55,8 @@ fastNLO: $(OBJS) fastNLODiffAlphas.h
 	-o $@
 
 
-testFast: testFast.o fastNLODiffAlphas.h
-	$(CC) -g -fopenmp  testFast.o $(LDFLAGS) \
+testFast: obj/testFast.o obj/fastNLODiffAlphas.o   
+	$(CC) -g -fopenmp  $^ $(LDFLAGS) \
 	-I$(FastNLOInstallDir)/include -L$(FastNLOInstallDir)/lib -lfastnlotoolkit \
 	$(LHA_INCLUDE)    -I$(DPDF_LIBS)  \
 	-L$(LHA_LIBS) -lLHAPDF \
@@ -106,7 +106,8 @@ clean-objs:
 
 
 obj/%.o: src/%.cc 
-	$(CC) -g -fopenmp   $(CFLAGS) -I$(DPDF_LIBS) -Iinc  -c $(ROOT_INCLUDE) $(LHA_INCLUDE) -I../PlottingHelper/      -o $@ $^   
+	$(CC) -g -fopenmp  $(CFLAGS) -I$(DPDF_LIBS) -Iinc  -c $(ROOT_INCLUDE) -I$(LHA_INCLUDE) -I../PlottingHelper/      -o $@ $^   
+
 
 
 all: fnlo-tk-h1diffpdf clean-objs

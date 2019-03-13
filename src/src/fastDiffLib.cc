@@ -289,7 +289,7 @@ Theory Histogram::CalculateRawNLO( fastNLODiffAlphas  &fnlodiff,  vector<double>
 
 	//fnlodiff.SetScaleFactorsMuRMuF(1.0, 1.0);
 	th.xsc = fnlodiff.GetDiffCrossSection();
-	
+
 
 	//Convert histogram to total
 	if(var_name.EqualTo("total") ||  var_name.EqualTo("xpom") ||  var_name.EqualTo("logxpom")  ) {
@@ -416,7 +416,7 @@ Theory Histogram::CalcTheory(TString theor_file, Setting setting)
 			fnlodiff.SetExternalFuncForMuF(funZEUSmuF);
 		}
 		else {
-			cout << "Unknown function tag" << endl;
+			cout << "Unknown function tag \"" << setting.scaleTag << "\"" <<   endl;
 			assert(0);
 		}
 
@@ -428,7 +428,7 @@ Theory Histogram::CalcTheory(TString theor_file, Setting setting)
 		// Set the xpom integration interval and method
 		// -------- Boris LRG dijets
 		if( theor_path.Contains("/VFPS/") ) {
-			fnlodiff.SetXPomLinSlicing( 20, 0.010 ,  .024 ); // VFPS range
+			fnlodiff.SetXPomLinSlicing( 20, 0.010 ,  0.024 ); // VFPS range
 			fnlodiff.SettIntegratedRange(-0.6);
 			fnlodiff.SetProtonE(920.);
 		}
@@ -821,7 +821,6 @@ Theory Histogram::CalculateVarNLO( fastNLODiffAlphas  &fnlodiff,  vector<double>
 	fastBinsHi = fnlodiff.GetObsBinsUpBounds(0);
 
 
-    cout << "RADEK " << __LINE__ << endl;
 	// calculate and access the cross section
 	typedef std::map<double,  std::vector < std::map< double, double > > >  array3D;
 
@@ -833,12 +832,10 @@ Theory Histogram::CalculateVarNLO( fastNLODiffAlphas  &fnlodiff,  vector<double>
 		bins[i] = xMin[i];
 	bins[nBins] = xMax[nBins-1];
 
-    cout << "RADEK " << __LINE__ << endl;
 	int hash = rand();
 
-    cout << "RADEK " << __LINE__ << endl;
+    TH1::AddDirectory(false);
 	TH1D *hist = new TH1D(TString::Format("hist%d", hash), "histogram", nBins, bins);
-    cout << "RADEK " << __LINE__ << endl;
 
 	//fnlodiff.SetLHAPDFMember(0);
 
@@ -846,7 +843,6 @@ Theory Histogram::CalculateVarNLO( fastNLODiffAlphas  &fnlodiff,  vector<double>
 	vector<double> NloXs=fnlodiff.GetDiffCrossSection();
 	xsQ2 = fnlodiff.Get3DCrossSection();
 
-    cout << "RADEK " << __LINE__ << endl;
 	/*
 	double Sum=0;
 	for(int i = 0; i <NloXs.size(); ++i) {
@@ -857,7 +853,6 @@ Theory Histogram::CalculateVarNLO( fastNLODiffAlphas  &fnlodiff,  vector<double>
 	exit(0);
 	*/
 
-    cout << "RADEK " << __LINE__ << endl;
 
 
 	//For interpretation
@@ -865,18 +860,16 @@ Theory Histogram::CalculateVarNLO( fastNLODiffAlphas  &fnlodiff,  vector<double>
 	TVectorD nloVec(fastBinsLo.size() );
 
 
-    cout << "RADEK " << __LINE__ << endl;
 	//Fill array of Q2
 	vector<double> Q2arr;
 	for(const auto &a :   (xsQ2.begin()->second)[0])
 		Q2arr.push_back(a.first);
 
-    cout << "RADEK " << __LINE__ << endl;
 
 
 
 
-	const int Niter = 4000;
+	const int Niter = 400;
 
     srand(1);
 
@@ -951,12 +944,12 @@ Theory Histogram::CalculateXpomNLO( fastNLODiffAlphas  &fnlodiff,  vector<double
 
 		th = CalculateRawNLO( fnlodiff,  fastBinsLo,  fastBinsHi  );
 
-		cout <<"Helenka " <<  th.xsc[0] << endl;
 		double bw = xMax[i] - xMin[i];
 
 		nloXpom[i]   = th.xsc[0] / bw;
 
 	}
+    //exit(0);
 	//Save it
 	th.xsc = nloXpom;
 

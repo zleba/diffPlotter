@@ -11,7 +11,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <cfloat>
-#include "fastnlotk/fastNLODiffReader.h"
+//#include "fastnlotk/fastNLODiffReader.h"
 #include "fastNLODiffAlphas.h"
 
 #include "TH1D.h"
@@ -33,16 +33,16 @@ vector<double> getXsec(string str, DPDFset &dpdf, int imem)
   //  If you want to receive your cross section in
   //   pb/GeV or in pb. Here we choose pb/GeV
   fnlodiff.SetUnits(fastNLO::kPublicationUnits);
-   fnlodiff.SetFit(fastNLODiffAlphas::Fit19);
+   //fnlodiff.SetFit(fastNLODiffAlphas::Fit19);
     fnlodiff.SettIntegratedRange(-1.);
     fnlodiff.SetProtonE(920.);
   
 
 
-	fnlodiff.SetContributionON(fastNLO::kFixedOrder,0,true);
+	fnlodiff.SetContributionON(fastNLO::kFixedOrder,0,false);
 	fnlodiff.SetContributionON(fastNLO::kFixedOrder,1,true);
 	//fnlodiff.SetContributionON(fastNLO::kFixedOrder,2,false);
-	fnlodiff.SetContributionON(fastNLO::kFixedOrder,2,true);
+	fnlodiff.SetContributionON(fastNLO::kFixedOrder,2,false);
 
 
 	//cout << "The file name is " << argv[1] << endl;
@@ -51,14 +51,28 @@ vector<double> getXsec(string str, DPDFset &dpdf, int imem)
   // Set the xpom integration interval and method
   // -------- Boris LRG dijets
   //fnlodiff.SetXPomLinSlicing( 5, xpomBins[i],  xpomBins[i+1]); // e.g. Boris LRG dijets
-  fnlodiff.SetXPomLinSlicing( 30, 0.000 ,  0.030 ); // e.g. Radek VFPS dijets
+  fnlodiff.SetXPomLinSlicing( 15, pow(10, -1.6), pow(10,-1.5) ); // e.g. Radek VFPS dijets
+
+  //fnlodiff.SetXPomLinSlicing( 30, pow(10, -2.3), pow(10,-2.2) ); // e.g. Radek VFPS dijets
+
+  //fnlodiff.SetXPomLinSlicing( 30, pow(10, -1.7), pow(10,-1.6) ); // e.g. Radek VFPS dijets
 
   fnlodiff.SetExternalFuncForMuR (&Function_Mu);
   fnlodiff.SetExternalFuncForMuF (&Function_Mu);
   fnlodiff.SettIntegratedRange(-1.);
 
   vector<double>  xs = fnlodiff.GetDiffCrossSection();
-  fnlodiff.PrintCrossSections();
+  //fnlodiff.PrintCrossSections();
+
+  double xTot = 0;
+  for(int k = 0; k < xs.size(); ++k) {
+      double w = fnlodiff.GetObsBinUpBound(k,0) - fnlodiff.GetObsBinLoBound(k,0);
+      xTot += xs[k] * w;
+  }
+
+  cout << "totX " <<str <<" "<<  xTot << endl;
+
+
   return xs;
 
 }
@@ -102,29 +116,26 @@ vector<double> hadCorr = {
   //for(int i = 0; i < xpomBins.size() - 1; ++i) {
   
     vector<string> files = {
-"../tables/nnlojet/FPS/nnlo/H1-LQall-8.diff_FPS_ptj1.newver.tab",
-"../tables/nnlojet/FPS/nnlo/H1-LQall-8.diff_FPS_deltaeta.newver.tab",
-"../tables/nnlojet/FPS/nnlo/H1-LQall-8.diff_FPS_q2.newver.tab",
-"../tables/nnlojet/FPS/nnlo/H1-LQall-8.diff_FPS_y.newver.tab",
-"../tables/nnlojet/FPS/nnlo/H1-LQall-8.diff_FPS_xi2zIP.newver.tab",
-"../tables/nnlojet/VFPS/nnlo/H1-LQall-8.diff_VFPS_etaavg.newver.tab",
-"../tables/nnlojet/VFPS/nnlo/H1-LQall-8.diff_VFPS_etadel.newver.tab",
-"../tables/nnlojet/VFPS/nnlo/H1-LQall-8.diff_VFPS_ptavg_12.newver.tab",
-"../tables/nnlojet/VFPS/nnlo/H1-LQall-8.diff_VFPS_ptj1.newver.tab",
-"../tables/nnlojet/VFPS/nnlo/H1-LQall-8.diff_VFPS_q2.newver.tab",
-"../tables/nnlojet/VFPS/nnlo/H1-LQall-8.diff_VFPS_xi2zIP.newver.tab",
-"../tables/nnlojet/VFPS/nnlo/H1-LQall-8.diff_VFPS_y.newver.tab",
-"../tables/nnlojet/VFPS/nnlo/H1-LQall-8.diff_VFPS_yMx.newver.tab",
+//"../tables/nnlojet/etaCutH1test/rad/diff_LRGH1/diff_LRGH1_y.RMS6.pre10.tab",
+//"../tables/nnlojet/etaCutH1test/rad/diff_LRGH1/diff_LRGH1_y.RMS8.pre10.tab",
+//"../tables/nnlojet/etaCutH1test/rad/diff_LRGH1/DIS.H1-LQall-8.vBa.diff_LRGH1_y.s87702.tab",
+//"../tables/nnlojet/etaCutH1test/rad/diff_LRGH1/H1-LQall-8.diff_LRGH1_y.NumEvtBinProc.RMS8.pre10.tab",
+
+"../tables/nnlojet/etaCutH1test/rad/diff_LRGH1/rad/R_2019_H1HERAI_DIS.H1-LQall-8.vRa.diff_LRGH1_y.s80999.tab",
+"../tables/nnlojet/etaCutH1test/rad/diff_LRGH1/rad/R_2019_H1HERAI_ptjet3_DIS.H1-LQall-8.vRa.diff_LRGH1_y.s80999.tab",
+"../tables/nnlojet/etaCutH1test/rad/diff_LRGH1/rad/R_2019_H1HERAI_ptjet3etahera_DIS.H1-LQall-8.vRa.diff_LRGH1_y.s80999.tab"
     };
 
+//"../tables/nnlojet/etaCutH1test/H1-LQall-8.diff_LRGH1_y.NumEvtBinProc.RMS8.pre10.tab",
+//"../tables/nnlojet/etaCutH1test/diff_LRGH1_y.RMS6.pre10.tab",
+//"../tables/nnlojet/etaCutH1test/DIS.H1-LQall-8.vBa.diff_LRGH1_y.s87702.tab", 
 
     DPDFset dpdf   = DPDFset("H1_DPDF_2006B_NLO_pom", "H1_DPDF_2006B_NLO_reg");
 
     vector<vector<vector<double>>> res(files.size());
     for(int k = 0; k < res.size(); ++k)
-        res[k].resize(31);
+        res[k].resize(1);
 
-#pragma omp parallel for
     for(int k = 0; k < res[0].size(); ++k) {
         for(int i = 0; i < files.size(); ++i) {
             res[i][k] = getXsec(files[i], dpdf, k);
@@ -146,11 +157,11 @@ vector<double> hadCorr = {
   //  If you want to receive your cross section in
   //   pb/GeV or in pb. Here we choose pb/GeV
   fnlodiff.SetUnits(fastNLO::kPublicationUnits);
-   fnlodiff.SetFit(fastNLODiffAlphas::ABCDE);
+   //fnlodiff.SetFit(fastNLODiffAlphas::ABCDE);
     fnlodiff.SettIntegratedRange(-1.);
     fnlodiff.SetProtonE(920.);
   
-	fnlodiff.SetContributionON(fastNLO::kFixedOrder,0,true);
+	fnlodiff.SetContributionON(fastNLO::kFixedOrder,0,false);
 	fnlodiff.SetContributionON(fastNLO::kFixedOrder,1,true);
 	//fnlodiff.SetContributionON(fastNLO::kFixedOrder,2,false);
 	fnlodiff.SetContributionON(fastNLO::kFixedOrder,2,true);
