@@ -1,0 +1,82 @@
+total
+nnlojet/LHeC
+lo:DIS.LHeC.vBa.LHeC_y.s1.tab
+dummy,#sigma_{tot} [pb]
+
+
+q2
+nnlojet/LHeC
+lo:DIS.LHeC.vBa.LHeC_q2.s1.tab
+Q^{2} [GeV^{2}],d#sigma/dQ^{2} [pb/GeV^{2}]
+
+
+y
+nnlojet/LHeC
+lo:DIS.LHeC.vBa.LHeC_y.s1.tab
+y,d#sigma/dy [pb]
+
+
+logxpom
+nnlojet/LHeC
+lo:DIS.LHeC.vBa.LHeC_y.s1.tab
+log_{10} x_{IP},d#sigma/dlog_{10} x_{IP} [pb]
+
+
+zpom
+nnlojet/LHeC
+lo:DIS.LHeC.vBa.LHeC_xi2zIP.s1.tab
+z_{IP}^{obs},d#sigma/dz_{IP}^{obs} [pb]
+
+
+ptjet1
+nnlojet/LHeC
+lo:DIS.LHeC.vBa.LHeC_ptj1.s1.tab
+p_{T}^{*jet1} [GeV],d#sigma/dp_{T}^{*jet1} [pb/GeV]
+
+
+ptjet2
+nnlojet/LHeC
+lo:DIS.LHeC.vBa.LHeC_ptj2.s1.tab
+p_{T}^{*jet2} [GeV],d#sigma/dp_{T}^{*jet2} [pb/GeV]
+
+
+etaj1
+nnlojet/LHeC
+lo:DIS.LHeC.vBa.LHeC_hera_etaj1.s1.tab
+#eta^{*jet1} [GeV],d#sigma/d#eta^{*jet1} [pb]
+
+
+etaj2
+nnlojet/LHeC
+lo:DIS.LHeC.vBa.LHeC_hera_etaj2.s1.tab
+#eta^{*jet2} [GeV],d#sigma/d#eta^{*jet2} [pb]
+
+
+ptavg
+nnlojet/LHeC
+lo:DIS.LHeC.vBa.LHeC_ptavg_12.s1.tab
+#LT p_{T}^{jets} #GT [GeV],d#sigma/#LT p_{T}^{jets} #GT [pb/GeV]
+
+
+deltaetaStar
+nnlojet/LHeC
+lo:DIS.LHeC.vBa.LHeC_deltaeta_12.s1.tab
+|#Delta#eta*|,d#sigma/d|#Delta#eta*| [pb]
+
+
+logxpom
+nnlojet/LHeC
+lo:DIS.LHeC.vBa.LHeC_y.s1.tab
+log_{10} x_{IP},#sigma/dlog_{10} x_{IP} [pb]
+%binLow binHigh
+-5   -4.5
+-4.5 -4
+-4   -3.5
+-3.5 -3
+-3   -2.5
+-2.5 -2
+-2   -1.5
+-1.5 -1
+-1   -0.5
+-0.5  0
+ 0    0.5

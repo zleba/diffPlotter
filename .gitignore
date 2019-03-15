@@ -1,0 +1,12 @@
+arma
+dpdfLib
+fastnlo
+fastnloBuild
+PlottingHelper
+*~
+*.o
+*.swp
+*.swo
+*.swo
+data
+src
