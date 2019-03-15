@@ -27,16 +27,19 @@ CFLAGS 	= -Wall -g -O0 -I$(FastNLOInstallDir)/include
 EXEC	= fastNLO
 
 
-fastCalc:  obj/diffCalc.o obj/fastDiffLib.o obj/fastNLODiffAlphas.o obj/diffPlotter.o
+fastCalc:  obj/diffCalc.o obj/fastDiffLib.o obj/fastNLODiffAlphas.o obj/diffPlotter.o obj/getchi2.o
 	$(CC) -g  -fopenmp $^  $(LDFLAGS) \
 	 -L$(FastNLOInstallDir)/lib -lfastnlotoolkit \
 	$(ROOT_LIBS)    \
 	-L$(DPDF_LIBS) -lDPDFset \
+	-L$(ARMA_DIR)/lib64 -larmadillo    \
 	-L../PlottingHelper/ -lPlottingHelper -Wl,-rpath,../PlottingHelper   \
 	-L$(LHA_LIBS)   -lLHAPDF \
+	-Wl,-rpath /opt/anaconda/3/pkgs/mkl-2019.1-144/lib/    \
 	-Wl,-rpath  $(LHA_LIBS)  \
 	-Wl,-rpath  $(DPDF_LIBS)  \
 	-Wl,-rpath $(FastNLOInstallDir)/lib \
+	-Wl,-rpath ../arma/install/lib64 \
 	-o $@
 
 
@@ -106,7 +109,7 @@ clean-objs:
 
 
 obj/%.o: src/%.cc 
-	$(CC) -g -fopenmp  $(CFLAGS) -I$(DPDF_LIBS) -Iinc  -c $(ROOT_INCLUDE) -I$(LHA_INCLUDE) -I../PlottingHelper/      -o $@ $^   
+	$(CC) -g -fopenmp  $(CFLAGS) -I$(DPDF_LIBS) -Iinc  -c $(ROOT_INCLUDE) -I$(LHA_INCLUDE)  -I$(ARMA_DIR)/include -I../PlottingHelper/      -o $@ $^   
 
 
 

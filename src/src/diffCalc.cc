@@ -135,7 +135,7 @@ int main(int argc, char** argv){
     can->SaveAs(can->GetTitle()+TString("["));
     //PlotFour(can, {"nlo:H1_DPDF_2006B_NLO-Q2pPt2", "nnlo:H1_DPDF_2006B_NLO-Q2pPt2"}, histVFPS, "q2", "ptjet1", "y", "deltaeta");
 
-    vector<TString> thVec = {"nnlo:lhaTest-Q2pPt2", "nnlo:H1_DPDF_2006B_NLO-Q2pPt2"};
+    vector<TString> thVec = {"nnlo:lhaTest-Q2pPt2", "nlo:H1_DPDF_2006B_NLO-Q2pPt2"};
     PlotFour(can, thVec, histVFPS, "zpom", "q2", "ptjet1", "y");
     PlotFour(can, thVec, histVFPS, "deltaeta", "meaneta", "xpom", "mx");
     PlotFour(can, thVec, histVFPS, "total");

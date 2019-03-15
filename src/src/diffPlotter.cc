@@ -19,6 +19,9 @@
 using namespace PlottingHelper;
 using namespace std;
 
+
+double getChi2(TString anal, TString var, vector<double> thVec);
+
 const map<TString,TString> names2D {
     {"ptjet1_q2_4_6",   "4 < Q^{2} < 6 GeV^{2}"},
     {"ptjet1_q2_6_10",  "6 < Q^{2} < 10 GeV^{2}"},
@@ -274,6 +277,16 @@ HistoErr Histogram::LoadDataHistogram()
 }
 
 
+vector<double> hist2vec(TH1D *hist)
+{
+    vector<double> v;
+    for(int i = 1; i <= hist->GetNbinsX(); ++i) {
+        double r = hist->GetBinContent(i);
+        v.push_back(r);
+    }
+    return v;
+}
+
 HistoErr Histogram::LoadThHistogram(TString refName, TString whatInside)
 {
 
@@ -475,9 +488,13 @@ void Histogram::plotNLOvsNNLO(vector<TString> typeNames)
         TString n = names2D.at(var_name);
         leg->SetHeader(n);
     }
+
+    double chi20 =  getChi2(tag, var_name, hist2vec(grTh[0].h));
+    double chi21 =  getChi2(tag, var_name, hist2vec(grTh[1].h));
+
 	leg->AddEntry(grData.gr,    SF("H1 %s data", tag.Data()), "ep");
-	leg->AddEntry(grTh[0].grAll,     "H1 Fit2019 NNLO" , "fl");
-	leg->AddEntry(grTh[1].grAll,     "H1 Fit2006B NLO" , "fl");
+	leg->AddEntry(grTh[0].grAll,     Form("H1 Fit2019 NNLO %g",chi20) , "fl");
+	leg->AddEntry(grTh[1].grAll,     Form("H1 Fit2006B NLO %g",chi21) , "fl");
     DrawLegends({leg});
 	//leg->Draw();
 
