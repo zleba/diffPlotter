@@ -636,23 +636,34 @@ AC_SUBST([SUBPROJECT],["toolkit"])
 AC_SUBST([WEBPAGE],["http://projects.hepforge.org/fastnlo"])
 AC_SUBST([YEARS],["2005-`date +%Y`"])
 
+
+
+
+
 # Output
 AC_CONFIG_FILES([Makefile
+                 fastnlotoolkit/Makefile
+                 fastnlotoolkit/include/Makefile
+                 fastnlotoolkit/include/fastnlotk/Makefile
+                 fastnlotoolkit/include/fastnlotk/fastNLOConstants.h
+                 src/Makefile
+                 src/fnlo-tk-config
                  check/Makefile
                  data/Makefile
                  data/check/Makefile
                  data/modify/Makefile
                  doc/Makefile
                  doc/fig/Makefile
-                 fastnlotoolkit/Makefile
-                 fastnlotoolkit/include/Makefile
-                 fastnlotoolkit/include/fastnlotk/Makefile
-                 fastnlotoolkit/include/fastnlotk/fastNLOConstants.h
                  fortranext/Makefile
                  pyext/Makefile
-                 src/Makefile
-                 src/fnlo-tk-config
+
+
                 ])
+
+
+
+
+
 
 AC_CONFIG_FILES([check/fnlo-tk-cattest.pl],[chmod +x check/fnlo-tk-cattest.pl])
 AC_CONFIG_FILES([check/fnlo-tk-cppnormtest.pl],[chmod +x check/fnlo-tk-cppnormtest.pl])

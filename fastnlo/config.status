@@ -393,7 +393,7 @@ on `(hostname || uname -n) 2>/dev/null | sed 1q`
 "
 
 # Files that config.status was made for.
-config_files=" Makefile check/Makefile data/Makefile data/check/Makefile data/modify/Makefile doc/Makefile doc/fig/Makefile fastnlotoolkit/Makefile fastnlotoolkit/include/Makefile fastnlotoolkit/include/fastnlotk/Makefile fastnlotoolkit/include/fastnlotk/fastNLOConstants.h fortranext/Makefile pyext/Makefile src/Makefile src/fnlo-tk-config check/fnlo-tk-cattest.pl check/fnlo-tk-cppnormtest.pl check/fnlo-tk-cppscalestest.pl check/fnlo-tk-cpptest.pl check/fnlo-tk-erasetest.pl check/fnlo-tk-erasetest2.pl check/fnlo-tk-mergetest.pl check/fnlo-tk-stattest.pl check/fnlo-tk-zipapp.pl check/fnlo-tk-ziptest.pl"
+config_files=" Makefile fastnlotoolkit/Makefile fastnlotoolkit/include/Makefile fastnlotoolkit/include/fastnlotk/Makefile fastnlotoolkit/include/fastnlotk/fastNLOConstants.h src/Makefile src/fnlo-tk-config check/Makefile data/Makefile data/check/Makefile data/modify/Makefile doc/Makefile doc/fig/Makefile fortranext/Makefile pyext/Makefile check/fnlo-tk-cattest.pl check/fnlo-tk-cppnormtest.pl check/fnlo-tk-cppscalestest.pl check/fnlo-tk-cpptest.pl check/fnlo-tk-erasetest.pl check/fnlo-tk-erasetest2.pl check/fnlo-tk-mergetest.pl check/fnlo-tk-stattest.pl check/fnlo-tk-zipapp.pl check/fnlo-tk-ziptest.pl"
 config_headers=" config.h"
 config_commands=" depfiles libtool"
 
@@ -910,20 +910,20 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "fastnlotoolkit/Makefile") CONFIG_FILES="$CONFIG_FILES fastnlotoolkit/Makefile" ;;
+    "fastnlotoolkit/include/Makefile") CONFIG_FILES="$CONFIG_FILES fastnlotoolkit/include/Makefile" ;;
+    "fastnlotoolkit/include/fastnlotk/Makefile") CONFIG_FILES="$CONFIG_FILES fastnlotoolkit/include/fastnlotk/Makefile" ;;
+    "fastnlotoolkit/include/fastnlotk/fastNLOConstants.h") CONFIG_FILES="$CONFIG_FILES fastnlotoolkit/include/fastnlotk/fastNLOConstants.h" ;;
+    "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+    "src/fnlo-tk-config") CONFIG_FILES="$CONFIG_FILES src/fnlo-tk-config" ;;
     "check/Makefile") CONFIG_FILES="$CONFIG_FILES check/Makefile" ;;
     "data/Makefile") CONFIG_FILES="$CONFIG_FILES data/Makefile" ;;
     "data/check/Makefile") CONFIG_FILES="$CONFIG_FILES data/check/Makefile" ;;
     "data/modify/Makefile") CONFIG_FILES="$CONFIG_FILES data/modify/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "doc/fig/Makefile") CONFIG_FILES="$CONFIG_FILES doc/fig/Makefile" ;;
-    "fastnlotoolkit/Makefile") CONFIG_FILES="$CONFIG_FILES fastnlotoolkit/Makefile" ;;
-    "fastnlotoolkit/include/Makefile") CONFIG_FILES="$CONFIG_FILES fastnlotoolkit/include/Makefile" ;;
-    "fastnlotoolkit/include/fastnlotk/Makefile") CONFIG_FILES="$CONFIG_FILES fastnlotoolkit/include/fastnlotk/Makefile" ;;
-    "fastnlotoolkit/include/fastnlotk/fastNLOConstants.h") CONFIG_FILES="$CONFIG_FILES fastnlotoolkit/include/fastnlotk/fastNLOConstants.h" ;;
     "fortranext/Makefile") CONFIG_FILES="$CONFIG_FILES fortranext/Makefile" ;;
     "pyext/Makefile") CONFIG_FILES="$CONFIG_FILES pyext/Makefile" ;;
-    "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
-    "src/fnlo-tk-config") CONFIG_FILES="$CONFIG_FILES src/fnlo-tk-config" ;;
     "check/fnlo-tk-cattest.pl") CONFIG_FILES="$CONFIG_FILES check/fnlo-tk-cattest.pl" ;;
     "check/fnlo-tk-cppnormtest.pl") CONFIG_FILES="$CONFIG_FILES check/fnlo-tk-cppnormtest.pl" ;;
     "check/fnlo-tk-cppscalestest.pl") CONFIG_FILES="$CONFIG_FILES check/fnlo-tk-cppscalestest.pl" ;;

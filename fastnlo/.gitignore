@@ -1,13 +1,13 @@
 *.lo
 *.la
 *.o
-data
+#data
 .deps
 .libs
-check
+#check
 doc
-fortranext
-pyext
+#fortranext
+#pyext
 
 fnlo-tk-example
 fnlo-tk-cat
