@@ -5,7 +5,7 @@
 .deps
 .libs
 #check
-doc
+#doc
 #fortranext
 #pyext
 
